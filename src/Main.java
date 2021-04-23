@@ -6,7 +6,15 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) {
-        Boolean verbindingVerbreken = DatabaseConnectie.verbindingSluiten();
+        Boolean verbindingMaken = DatabaseConnectie.verbindingMaken();
+
+        String inloggen = DatabaseConnectie.inloggen("job@hotmail.nl", "TestWachtwoord");
+        System.out.println(inloggen);
+        System.out.println();
+
+//        Boolean registreren = DatabaseConnectie.registreren("Job van Ardenne", "TestWachtwoord", "job@hotmail.nl");
+
+        Boolean verbindingSluiten = DatabaseConnectie.verbindingSluiten();
     }
 
 }
