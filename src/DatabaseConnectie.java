@@ -1,6 +1,7 @@
 package src;
 import com.mysql.cj.protocol.Resultset;
 
+import javax.xml.crypto.Data;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -38,6 +39,9 @@ public class DatabaseConnectie {
 
 
     public static String inloggen(String gebruikersnaam, String wachtwoord){
+
+        DatabaseConnectie.verbindingMaken();
+
         PreparedStatement statementGebruikersnaam = null;
         ResultSet rs = null;
         String inlogStatus = null;
@@ -127,6 +131,8 @@ public class DatabaseConnectie {
             System.out.println();
         }
 
+        DatabaseConnectie.verbindingSluiten();
+
         return inlogStatus;
     }
 
@@ -135,6 +141,9 @@ public class DatabaseConnectie {
 
 
     public static boolean registreren(String fullName, String password, String emailaddress) {
+
+        DatabaseConnectie.verbindingMaken();
+
         boolean isGeregistreerd = true;
         PreparedStatement statementRegistreren = null;
         int rs = 9999;
@@ -186,6 +195,9 @@ public class DatabaseConnectie {
         }
 
         System.out.println(rs);
+
+        DatabaseConnectie.verbindingSluiten();
+
         return isGeregistreerd;
     }
 
