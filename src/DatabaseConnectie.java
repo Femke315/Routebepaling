@@ -37,11 +37,7 @@ public class DatabaseConnectie {
     }
 
 
-
     public static String inloggen(String gebruikersnaam, String wachtwoord){
-
-        DatabaseConnectie.verbindingMaken();
-
         PreparedStatement statementGebruikersnaam = null;
         ResultSet rs = null;
         String inlogStatus = null;
@@ -49,95 +45,96 @@ public class DatabaseConnectie {
         boolean wachtwoordKlopt = false;
         boolean permissieKlopt = true;
 
-        // Gebruikersnaam checken
-        try {
-            statementGebruikersnaam = connection.prepareStatement("SELECT * FROM people WHERE EmailAddress = ?");
-            statementGebruikersnaam.setString(1, gebruikersnaam);
-            rs = statementGebruikersnaam.executeQuery();
-            rs.next();
-            gebruikersnaamKlopt = (rs.getString(15).equals(gebruikersnaam));
-        } catch (SQLException throwables) {
-            System.out.println("inloggen() = Statement kon niet worden aangemaakt:");
-            inlogStatus = "Mail is niet bekend in ons systeem";
-            System.out.println(throwables.toString());
-            System.out.println();
-        }
-        if (!gebruikersnaamKlopt) {
-            inlogStatus = "Mail is niet bekend in ons systeem";
-        }
+        if (DatabaseConnectie.verbindingMaken()) {
 
-
-        // Wachtwoord checken
-        if (rs != null && gebruikersnaamKlopt) {
-            MessageDigest digest = null;
-            byte[] hash = null;
-
+            // Gebruikersnaam checken
             try {
-                digest = MessageDigest.getInstance("SHA-256");
-                hash = digest.digest(wachtwoord.getBytes(StandardCharsets.UTF_8));
-            } catch (NoSuchAlgorithmException throwables) {
-                System.out.println("inloggen() = Wachtwoord kon niet worden gehashed:");
-                inlogStatus = "Wachtwoord is niet geldig";
-                System.out.println(throwables.toString());
-                System.out.println();
-            }
-
-            try {
-                wachtwoordKlopt = (Arrays.equals(rs.getBytes(8), hash));
-
-                System.out.println();
+                statementGebruikersnaam = connection.prepareStatement("SELECT * FROM people WHERE EmailAddress = ?");
+                statementGebruikersnaam.setString(1, gebruikersnaam);
+                rs = statementGebruikersnaam.executeQuery();
+                rs.next();
+                gebruikersnaamKlopt = (rs.getString(15).equals(gebruikersnaam));
             } catch (SQLException throwables) {
-                System.out.println("inloggen() = Wachtwoorden konden niet worden vergeleken:");
-                inlogStatus = "Wachtwoord kon niet worden vergeleken";
+                System.out.println("inloggen() = Statement kon niet worden aangemaakt:");
+                inlogStatus = "Mail is niet bekend in ons systeem";
                 System.out.println(throwables.toString());
                 System.out.println();
             }
-
-            if (!wachtwoordKlopt) {
-                inlogStatus = "Wachtwoord is onjuist";
+            if (!gebruikersnaamKlopt) {
+                inlogStatus = "Mail is niet bekend in ons systeem";
             }
-        }
 
 
-        // Permissie checken
-        if (rs != null && gebruikersnaamKlopt && wachtwoordKlopt) {
+            // Wachtwoord checken
+            if (rs != null && gebruikersnaamKlopt) {
+                MessageDigest digest = null;
+                byte[] hash = null;
+
+                try {
+                    digest = MessageDigest.getInstance("SHA-256");
+                    hash = digest.digest(wachtwoord.getBytes(StandardCharsets.UTF_8));
+                } catch (NoSuchAlgorithmException throwables) {
+                    System.out.println("inloggen() = Wachtwoord kon niet worden gehashed:");
+                    inlogStatus = "Wachtwoord is niet geldig";
+                    System.out.println(throwables.toString());
+                    System.out.println();
+                }
+
+                try {
+                    wachtwoordKlopt = (Arrays.equals(rs.getBytes(8), hash));
+
+                    System.out.println();
+                } catch (SQLException throwables) {
+                    System.out.println("inloggen() = Wachtwoorden konden niet worden vergeleken:");
+                    inlogStatus = "Wachtwoord kon niet worden vergeleken";
+                    System.out.println(throwables.toString());
+                    System.out.println();
+                }
+
+                if (!wachtwoordKlopt) {
+                    inlogStatus = "Wachtwoord is onjuist";
+                }
+            }
+
+
+            // Permissie checken
+            if (rs != null && gebruikersnaamKlopt && wachtwoordKlopt) {
+                try {
+                    permissieKlopt = rs.getBoolean(5);
+                } catch (SQLException throwables) {
+                    System.out.println("inloggen() = Permissie gegevens konden niet opgehaalt worden:");
+                    inlogStatus = "Permissie gegevens konden niet opgehaalt worden";
+                    System.out.println(throwables.toString());
+                    System.out.println();
+                }
+
+                if (!permissieKlopt) {
+                    inlogStatus = "Account heeft geen toegang om in te loggen";
+                } else {
+                    inlogStatus = "Account is ingelogd";
+                }
+            }
+
+
+            // Query result afsluiten
             try {
-                permissieKlopt = rs.getBoolean(5);
+                assert statementGebruikersnaam != null;
+                statementGebruikersnaam.close();
+                assert rs != null;
+                rs.close();
             } catch (SQLException throwables) {
-                System.out.println("inloggen() = Permissie gegevens konden niet opgehaalt worden:");
-                inlogStatus = "Permissie gegevens konden niet opgehaalt worden";
+                gebruikersnaamKlopt = false;
+                System.out.println("inloggen() = Afsluiten statement of resultset is niet gelukt:");
                 System.out.println(throwables.toString());
                 System.out.println();
             }
 
-            if (!permissieKlopt) {
-                inlogStatus = "Account heeft geen toegang om in te loggen";
-            } else {
-                inlogStatus = "Account is ingelogd";
-            }
+            DatabaseConnectie.verbindingSluiten();
+        } else {
+            inlogStatus = "Geen verbinding met database";
         }
-
-
-        // Query result afsluiten
-        try {
-            assert statementGebruikersnaam != null;
-            statementGebruikersnaam.close();
-            assert rs != null;
-            rs.close();
-        } catch (SQLException throwables) {
-            gebruikersnaamKlopt = false;
-            System.out.println("inloggen() = Afsluiten statement of resultset is niet gelukt:");
-            System.out.println(throwables.toString());
-            System.out.println();
-        }
-
-        DatabaseConnectie.verbindingSluiten();
-
-        return inlogStatus;
+            return inlogStatus;
     }
-
-
-
 
 
     public static boolean registreren(String fullName, String password, String emailaddress) {
@@ -202,10 +199,6 @@ public class DatabaseConnectie {
     }
 
 
-
-
-
-
     public static boolean verbindingSluiten(){
         boolean isGesloten = true;
         SQLException foutmelding = null;
@@ -232,11 +225,6 @@ public class DatabaseConnectie {
             return false;
         }
     }
-
-
-
-
-
 
 
 }

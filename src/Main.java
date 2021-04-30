@@ -18,8 +18,6 @@ public class Main {
 //        Boolean verbindingSluiten = DatabaseConnectie.verbindingSluiten();
 
         HoofdschermGUI Scherm = new HoofdschermGUI();
-
-
     }
 
 }
