@@ -1,4 +1,4 @@
-package src;
+//package src;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,8 +29,9 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
 
         aanmakenBasisScherm();
 
-        aanmakenLoginPagina();
+//        aanmakenLoginPagina();
 
+        accountPagina();
         setVisible(true);
     }
 
@@ -270,6 +271,11 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         add(titelbalk);
     }
 
+    public void accountPagina(){
+        setTitle("NerdyGadgets - accountgegevens");
+        JPanel accountPagina= new Accountpagina();
+        add(accountPagina);
+    }
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == loginBevestig) {

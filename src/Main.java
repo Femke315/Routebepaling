@@ -7,13 +7,10 @@ public class Main {
     public static void main(String[] args) {
 
 //        Boolean verbindingMaken = DatabaseConnectie.verbindingMaken();
-//
-//        String inloggen = DatabaseConnectie.inloggen("job@hotmail.nl", "TestWachtwoord");
-//        System.out.println(inloggen);
-//        System.out.println();
-//
-////        Boolean registreren = DatabaseConnectie.registreren("Job van Ardenne", "TestWachtwoord", "job@hotmail.nl");
-//
+
+//       Boolean registreren = DatabaseConnectie.registreren("Test van der Test", "TestWachtwoord", "Test123@nerdy.com");
+//        System.out.println("registratie: " + registreren);
+
 //        Boolean verbindingSluiten = DatabaseConnectie.verbindingSluiten();
 
         HoofdschermGUI Scherm = new HoofdschermGUI();
