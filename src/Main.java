@@ -14,6 +14,7 @@ public class Main {
 //        Boolean verbindingSluiten = DatabaseConnectie.verbindingSluiten();
 
         HoofdschermGUI Scherm = new HoofdschermGUI();
+        Scherm.setVisible(true);
     }
 
 }

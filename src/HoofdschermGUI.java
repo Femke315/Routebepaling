@@ -11,6 +11,7 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
     private Color secondColor = new Color(115,115,191);
     private Color textColor = Color.white;
     private JLabel titelTekst = new JLabel("");
+    private JPanel pagina;
 
     // Attributen voor loginpagina
     private JTextField loginMail;
@@ -32,7 +33,7 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
 //        aanmakenLoginPagina();
 
         accountPagina();
-        setVisible(true);
+//        setVisible(true);
     }
 
 
@@ -272,9 +273,13 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
     }
 
     public void accountPagina(){
-        setTitle("NerdyGadgets - accountgegevens");
-        JPanel accountPagina= new Accountpagina();
-        add(accountPagina);
+        setLayout(new BorderLayout());
+        titelTekst.setText("NerdyGadgets - account");
+
+//        pagina= new Accountpagina(this, loginMail.getText());
+        pagina= new Accountpagina(this, "Test123@nerdyG.com");
+        add(pagina, BorderLayout.PAGE_END);
+
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -288,6 +293,10 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
                 loginMelding.setText(loginResultaat);
             }
         }
+    }
+
+    public void setUndecorated() {
+        setUndecorated();
     }
 }
 

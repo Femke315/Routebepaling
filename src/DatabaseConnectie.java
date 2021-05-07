@@ -36,6 +36,28 @@ public class DatabaseConnectie {
         return isVerbonden;
     }
 
+    public static Connection connectieDoorgeven(){
+        String url = "jdbc:mysql://localhost/nerdygadgets";
+        String username = "root", password = "";
+        boolean isVerbonden = true;
+        SQLException foutmelding = null;
+
+        try {
+            connection = DriverManager.getConnection(url,username,password);
+        } catch (SQLException throwables) {
+            isVerbonden = false;
+            foutmelding = throwables;
+        }
+        if (isVerbonden) {
+            System.out.println("verbindingMaken() = Er is verbinding gemaakt met de database!");
+            System.out.println();
+        } else {
+            System.out.println("verbindingMaken() = Er kon geen verbinding worden gemaakt met de database:");
+            System.out.println(foutmelding.toString());
+            System.out.println();
+        }
+        return connection;
+    }
 
     public static String inloggen(String gebruikersnaam, String wachtwoord){
         PreparedStatement statementGebruikersnaam = null;
