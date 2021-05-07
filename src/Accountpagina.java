@@ -21,7 +21,7 @@ public class Accountpagina extends JPanel implements ActionListener{
 
     public Accountpagina(HoofdschermGUI frame, String ingelogdeEmail){
         this.frame=frame;
-        emailadres=ingelogdeEmail;
+        emailadres=ingelogdeEmail;//Denk aan dat deze emailadres in de people tabel zit!
         setBackground(Color.white);
         this.setPreferredSize(new Dimension(400,360));
         setLayout(new GridLayout(0,2));
@@ -34,7 +34,7 @@ public class Accountpagina extends JPanel implements ActionListener{
         veranderemail= new JButton("✏️");
 //        telefoonnummer= new JTextField("0000000000");
         veranderTel= new JButton("✏️");
-        werknemersnummer= new JLabel("1234567");
+        werknemersnummer= new JLabel("Werknemersnummer: 1234567");
         menu= new JButton("Menu");
         menu.addActionListener(this);
 
@@ -55,6 +55,7 @@ public class Accountpagina extends JPanel implements ActionListener{
         if(e.getSource()==menu){
             frame.setUndecorated();
             setVisible(false);
+            //afrondenpagina +  menu
         }
     }
 
