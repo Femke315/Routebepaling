@@ -118,12 +118,12 @@ GRANT SELECT ON nerdygadgets.stockitemholdings TO 'bezorger'@'localhost';
 GRANT SELECT ON nerdygadgets.orderlines TO 'bezorger'@'localhost'; 
 
 /*grant statements magazijn sorteerder*/
-GRANT SELECT ON nerdygadgets.people TO 'sorteerder '@'localhost'; 
-GRANT SELECT ON nerdygadgets.orders TO 'sorteerder '@'localhost'; 
-GRANT SELECT ON nerdygadgets.postcode TO 'sorteerder '@'localhost'; 
-GRANT SELECT ON nerdygadgets.stockitems TO 'sorteerder '@'localhost'; 
-GRANT SELECT ON nerdygadgets.stockitemholdings TO 'sorteerder '@'localhost'; 
-GRANT SELECT ON nerdygadgets.orderlines TO 'sorteerder '@'localhost';
+GRANT SELECT ON nerdygadgets.people TO 'sorteerder'@'localhost'; 
+GRANT SELECT ON nerdygadgets.orders TO 'sorteerder'@'localhost'; 
+GRANT SELECT ON nerdygadgets.postcode TO 'sorteerder'@'localhost'; 
+GRANT SELECT ON nerdygadgets.stockitems TO 'sorteerder'@'localhost'; 
+GRANT SELECT ON nerdygadgets.stockitemholdings TO 'sorteerder'@'localhost'; 
+GRANT SELECT ON nerdygadgets.orderlines TO 'sorteerder'@'localhost';
 
 
 /*grant statements magazijn manager*/
