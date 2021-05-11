@@ -3,6 +3,12 @@
 ALTER TABLE people
 ADD postcode varchar(20) Not null;
 
+
+/*Toevoegen route kolom in orders*/
+ALTER TABLE route
+ADD RouteID int null, ADD Status varchar(50) null;
+
+
 use nerdygadgets;
 
 /*Toevoegen postcode tabel*/
@@ -40,6 +46,11 @@ CREATE TABLE route
     CHECK (Status IN ("Klaar voor bezorging", "Onderweg", "Afgerond", "Anders", "Klaar voor sorteren"))
 );
 
+
+
+/*Verbinding maken met de klant en de gemaakt bestelling*/
+ALTER TABLE Orders
+ADD FOREIGN KEY (PersonID) REFERENCES Persons(PersonID);
 
 /*Kolommen RouteID & Opmerkingen toevoegen aan Orders tabel*/
 ALTER TABLE orders
@@ -130,18 +141,29 @@ FLUSH PRIVILEGES;
 /*alles users laten zien*/
 SELECT * FROM mysql.user;
 
+/*Toevoegen routelines tabel*/
+/*deze staat hier, omdat we dan zeker zijn dat de route tabel is gemaakt*/ 
+CREATE TABLE routelines
+(
+    RouteID int not null,
+    PersonID int not null,
+    OrderID int not null,
+    CONSTRAINT PK_route PRIMARY KEY (RouteID, PersonID, OrderID),
+    CONSTRAINT FK_PersonRouteline FOREIGN KEY (PersonID) REFERENCES people(PersonID),
+    CONSTRAINT FK_RouteRouteline FOREIGN KEY (RouteID) REFERENCES route(RouteID),
+    CONSTRAINT FK_OrderRouteline FOREIGN KEY (OrderID) REFERENCES orders(OrderID)    
+);
 
 
-
-use nerdygadgets;
-DELIMITER // 
-CREATE TRIGGER toebedelenBezorger 
-    BEFORE UPDATE ON route 
-    FOR EACH ROW 
-       BEGIN 
-         IF new.Status ='Onderweg' AND PersonID is null 
-         THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Geen bezorger toegewezen aan de route'; 
-         END IF; 
-       END; 
- // 
-DELIMITER ; 
+-- use nerdygadgets;
+-- DELIMITER // 
+-- CREATE TRIGGER toebedelenBezorger 
+--     BEFORE UPDATE ON route 
+--     FOR EACH ROW 
+--        BEGIN 
+--          IF new.Status ='Onderweg' AND PersonID is null 
+--          THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Geen bezorger toegewezen aan de route'; 
+--          END IF; 
+--        END; 
+--  // 
+-- DELIMITER ; 
