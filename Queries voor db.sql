@@ -5,8 +5,8 @@ ADD postcode varchar(20) Not null;
 
 
 /*Toevoegen route kolom in orders*/
-ALTER TABLE route
-ADD RouteID int null, ADD Status varchar(50) null;
+ALTER TABLE orders
+ADD column RouteID int null, ADD Status varchar(50) null;
 
 
 use nerdygadgets;
@@ -50,13 +50,12 @@ CREATE TABLE route
 
 /*Verbinding maken met de klant en de gemaakt bestelling*/
 ALTER TABLE Orders
-ADD FOREIGN KEY (PersonID) REFERENCES Persons(PersonID);
+ADD FOREIGN KEY (CusomerID) REFERENCES people(PersonID);
 
-/*Kolommen RouteID & Opmerkingen toevoegen aan Orders tabel*/
+/*Kolommen RouteID van orders tabel verbinden aan route tabel*/
 ALTER TABLE orders
-ADD RouteID int not null, ADD CONSTRAINT FOREIGN KEY(RouteID) REFERENCES Route(RouteID),
-ADD Status varchar(100) null,
-Add Opmerkingen longtext not null;
+ADD CONSTRAINT FOREIGN KEY(RouteID) REFERENCES Route(RouteID);
+
 
 /*Weet niet of de check constraint in dezelfde query kan, waarin de kolom waar het om gaat wordt gemaakt*/
 ALTER TABLE orders
