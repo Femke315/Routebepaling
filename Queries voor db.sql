@@ -153,6 +153,11 @@ CREATE TABLE routelines
     CONSTRAINT FK_OrderRouteline FOREIGN KEY (OrderID) REFERENCES orders(OrderID)    
 );
 
+/* Aanpassen kolom namen naar functie van actoren */   
+ALTER TABLE people CHANGE IsSystemUser isStockManager BOOLEAN;
+ALTER TABLE people CHANGE IsEmployee isStockSorter BOOLEAN;
+ALTER TABLE people CHANGE IsSalesperson isDeliverer BOOLEAN;
+
 
 -- use nerdygadgets;
 -- DELIMITER // 
