@@ -36,6 +36,9 @@ public class DatabaseConnectie {
         return isVerbonden;
     }
 
+    public static Connection getConnection() {
+        return connection;
+    }
 
     public static String inloggen(String gebruikersnaam, String wachtwoord){
         PreparedStatement statementGebruikersnaam = null;
