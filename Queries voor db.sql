@@ -145,10 +145,9 @@ SELECT * FROM mysql.user;
 CREATE TABLE routelines
 (
     RouteID int not null,
-    PersonID int not null,
+    VolgordeID int not null,
     OrderID int not null,
-    CONSTRAINT PK_route PRIMARY KEY (RouteID, PersonID, OrderID),
-    CONSTRAINT FK_PersonRouteline FOREIGN KEY (PersonID) REFERENCES people(PersonID),
+    CONSTRAINT PK_route PRIMARY KEY (RouteID, VolgordeID, OrderID),
     CONSTRAINT FK_RouteRouteline FOREIGN KEY (RouteID) REFERENCES route(RouteID),
     CONSTRAINT FK_OrderRouteline FOREIGN KEY (OrderID) REFERENCES orders(OrderID)    
 );
