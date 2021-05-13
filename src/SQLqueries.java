@@ -52,21 +52,102 @@ public class SQLqueries {
         DatabaseConnectie.verbindingSluiten();
     }
 
-    public Resultset getOrderlines(){
+    public Resultset getOrderlines(int orderID){
+        //create statement/query
+        String query = "SELECT OrderLineID FROM orderlines WHERE OrderID=?";
 
+        try (
+                //maal er een prepared statment + connectie
+                PreparedStatement stmt = connection.prepareStatement(query))
+        {
+            stmt.setInt(1, orderID);//parameter toevoegen in query
+            try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
+                while(rs.next()) {
+                    System.out.println("OrderLineID: " + rs.getInt("OrderLineID"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public Resultset getRoutes(){
+    public Resultset getRoutes(String status){
+        //create statement/query
+        String query = "SELECT RouteID, Provincie, Status From route WHERE Status=?";
 
+        try (
+                //maal er een prepared statment + connectie
+                PreparedStatement stmt = connection.prepareStatement(query))
+        {
+            stmt.setString(1, status);//parameter toevoegen in query
+            try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
+                while(rs.next()) {
+                    System.out.print("RouteID: " + rs.getInt("RouteID"));
+                    System.out.print(", Provincie: " + rs.getString("Provincie"));
+                    System.out.println(", Status: " + rs.getString("Status"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
-    public Resultset getpeople(){
+
+    public Resultset getpeople(int personID){
 //+postcode, dus met postcode tabel
-    }
-    public Resultset getRoutelines(){
+        String query = "SELECT PersonID, FullName, isStockManager, isStockSorter, isDeliverer, Emailaddress, PhoneNumber, pe.postcode, po.provincie FROM people pe INNER JOIN postcode po ON pe.postcode=po.PostCodePK WHERE PersonID=?";
 
+        try (
+                //maal er een prepared statment + connectie
+                PreparedStatement stmt = connection.prepareStatement(query))
+        {
+            stmt.setInt(1, personID);//parameter toevoegen in query
+            try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
+                while(rs.next()) {
+                    System.out.println("PersonID: " + rs.getInt("PersonID"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public Resultset getRoutelines(int routeID){
+        String query = "SELECT * FROM routelines WHERE RouteID=?";
+
+        try (
+                //maal er een prepared statment + connectie
+                PreparedStatement stmt = connection.prepareStatement(query))
+        {
+            stmt.setInt(1, routeID);//parameter toevoegen in query
+            try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
+                while(rs.next()) {
+                    System.out.print("PersonID: " + rs.getInt("PersonID"));
+                    System.out.print("OrderID: " + rs.getInt("OrderID"));
+                    System.out.println("VolgorderID: " + rs.getInt("VolgordeID"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public Resultset getProducts(){
+    public Resultset getProducts(int productID){
 //+voorraad, dus met stockitemholdings tabel
+        String query = " SELECT si.StockitemID, si.StockItemName, QuantityOnHand From StockItems si LEFT JOIN stockitemholdings sh ON si.StockItemID=sh.StockItemID WHERE si.StockitemID=?";
+
+        try (
+                //maal er een prepared statment + connectie
+                PreparedStatement stmt = connection.prepareStatement(query))
+        {
+            stmt.setInt(1, productID);//parameter toevoegen in query
+            try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
+                while(rs.next()) {
+                    System.out.print("StockitemID: " + rs.getInt("StockitemID"));
+                    System.out.print("description: " + rs.getInt("StockItemName"));
+                    System.out.println("QuantityOnHand: " + rs.getInt("Quantity"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
