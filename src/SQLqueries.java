@@ -15,21 +15,23 @@ public class SQLqueries {
         boolean isgeautoriseerd = true;
         PreparedStatement stmOrders = null;
 
-        if(isgeautoriseerd)//en geautoriseerd
+
+
+        if(isgeautoriseerd)//CHeck autorisatie?
         {
-            String query = "SELECT * from orders WHERE CustomerID = limit 100";
-            try(
-                Statement stmt = connection.createStatement();
-                stmt.setInt(1, provincie)
-                ResultSet rs = stmt.executeQuery(query);
-            ) {
-                while(rs.next()){
-                    //Display values
-                    System.out.print("OrderID: " + rs.getInt("OrderID"));
-                    System.out.print(", CustomerID: " + rs.getInt("CustomerID"));
-                    System.out.print(", RouteID: " + rs.getInt("RouteID"));
-                    System.out.print(", Status: " + rs.getString("Status"));
-                    System.out.println(", Comments: " + rs.getString("Comments"));
+            //create statement/query
+            String query = "SELECT OrderID FROM orders o INNER JOIN people p ON o.CustomerID=p.PersonID WHERE p.postcode IN (" +
+                    "SELECT PostCodePK FROM postcode WHERE provincie = ? ) limit 100";
+
+            try (
+                    //maal er een prepared statment + connectie
+                    PreparedStatement stmt = connection.prepareStatement(query))
+            {
+                stmt.setString(1, provincie);//parameter toevoegen in query
+                try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
+                    while(rs.next()) {
+                        System.out.println("OrderID: " + rs.getInt("OrderID"));
+                    }
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
