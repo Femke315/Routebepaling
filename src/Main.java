@@ -16,7 +16,12 @@ public class Main {
 //
 //        Boolean verbindingSluiten = DatabaseConnectie.verbindingSluiten();
 
-        HoofdschermGUI Scherm = new HoofdschermGUI();
+//        HoofdschermGUI Scherm = new HoofdschermGUI();
+
+        SQLqueries queries= new SQLqueries();
+//        queries.getProducts(37);//test getProduct()
+        queries.getRoutes("Klaar voor sorteren");
     }
+
 
 }

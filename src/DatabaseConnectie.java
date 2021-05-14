@@ -37,6 +37,7 @@ public class DatabaseConnectie {
     }
 
     public static Connection getConnection() {
+        verbindingMaken();
         return connection;
     }
 
@@ -214,8 +215,7 @@ public class DatabaseConnectie {
                 foutmelding = throwables;
             }
             if (isGesloten) {
-                System.out.println("verbindingSluiten() = De verbinding met de database is verbroken!");
-                System.out.println();
+                System.out.println("\nverbindingSluiten() = De verbinding met de database is verbroken!\n");
             } else {
                 System.out.println("verbindingSluiten() = De verbinding met de database kon niet worden verbroken:");
                 System.out.println(foutmelding.toString());
