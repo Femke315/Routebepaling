@@ -1,6 +1,7 @@
 import com.mysql.cj.protocol.Resultset;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class SQLqueries {
     private static Connection connection;
@@ -80,9 +81,6 @@ public class SQLqueries {
             try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
                 while(rs.next()) {
                     String routeZin = "RouteID: " + rs.getInt("RouteID") + ", Provincie: " + rs.getString("Provincie") + ", Status: " + rs.getString("Status");
-//                    System.out.print("RouteID: " + rs.getInt("RouteID"));
-//                    System.out.print(", Provincie: " + rs.getString("Provincie"));
-//                    System.out.println(", Status: " + rs.getString("Status"));
                     routes[iterationNum]= routeZin;
                     iterationNum++;
                 }
@@ -98,19 +96,25 @@ public class SQLqueries {
         }
     }
 
-    public void getpeople(int personID){
-        DatabaseConnectie.verbindingMaken();
+    public void getpeople(int personID){//kan nu dus nog maar 1 persoon ophalen
 //+postcode, dus met postcode tabel
         String query = "SELECT PersonID, FullName, isStockManager, isStockSorter, isDeliverer, Emailaddress, PhoneNumber, pe.postcode, po.provincie FROM people pe INNER JOIN postcode po ON pe.postcode=po.PostCodePK WHERE PersonID=?";
+        ArrayList<String> persoon = new ArrayList<String>();
 
         try (
                 //maal er een prepared statment + connectie
-                PreparedStatement stmt = connection.prepareStatement(query))
+                PreparedStatement stmt = this.connection.prepareStatement(query))
         {
             stmt.setInt(1, personID);//parameter toevoegen in query
             try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
                 while(rs.next()) {
-                    System.out.println("PersonID: " + rs.getInt("PersonID"));
+//                    System.out.print("PersonID: " + rs.getInt("PersonID"));
+//                    System.out.print(", Fullname: " + rs.getString("FullName"));
+//                    System.out.print(", Emailadress: " + rs.getString("Emailaddress"));
+//                    System.out.print(", provincie: " + rs.getString("Provincie"));
+//                    System.out.println(", postcode: " + rs.getString("postcode"));
+                    String persoonsGegevens= "PersonID: " + rs.getInt("PersonID") + ", Fullname: " + rs.getString("FullName") + ", Emailadress: " + rs.getString("Emailaddress")+ ", provincie: " + rs.getString("Provincie")+ ", postcode: " + rs.getString("postcode");
+                    persoon.add(persoonsGegevens);
                 }
             }
         } catch (SQLException e) {
@@ -118,6 +122,8 @@ public class SQLqueries {
         }
         DatabaseConnectie.verbindingSluiten();
 
+        //laat opgehaalde gegevens zien
+        System.out.println(persoon);
     }
     public void getRoutelines(int routeID){
         DatabaseConnectie.verbindingMaken();
