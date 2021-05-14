@@ -38,7 +38,7 @@ CREATE TABLE route
     AantalPakketten int not null,
     Reistijd decimal(3,2),
     Afstand Varchar(10) not null,
-    Provincie varchar(45),
+    Provincie varchar(45) not null,
     Status varchar(50) Not null,
     Opmerkingen varchar(200) null,
     CONSTRAINT PK_route PRIMARY KEY (RouteID),
