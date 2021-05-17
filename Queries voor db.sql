@@ -48,9 +48,7 @@ CREATE TABLE route
 
 
 
-/*Verbinding maken met de klant en de gemaakt bestelling*/
-ALTER TABLE Orders
-ADD FOREIGN KEY (CusomerID) REFERENCES people(PersonID);
+
 
 /*Kolommen RouteID van orders tabel verbinden aan route tabel*/
 ALTER TABLE orders
@@ -100,7 +98,10 @@ MODIFY IsExternalLogonProvider tinyint(1) NULL;
 /*check constraints*/
 ALTER TABLE route ADD CONSTRAINT check_aangewezenBezorger CHECK (PersonID); 
 
-
+/*Verbinding maken met de klant en de gemaakt bestelling*/
+ALTER TABLE Orders
+ADD FOREIGN KEY (KlantID) REFERENCES people(PersonID);
+						   
 
 /*bezorger, magazijn sorteerder, magazijn manager account maken*/
 CREATE user 'bezorger'@'localhost'  IDENTIFIED BY '<eigen wachtwoord>';
