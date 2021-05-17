@@ -20,8 +20,10 @@ public class Main {
 
         SQLqueries queries= new SQLqueries();//connectie wordt hierin gemaakt
 //        queries.getProducts(37);//test getProduct()
-//        queries.getRoutes("Klaar voor sorteren");
-        queries.getpeople(3146);//Connectie wordt hierin gesloten
+//        queries.getRoutes();
+//        queries.getpeople(3146);//Connectie wordt hierin gesloten
+//        queries.getOrderlines(73596);
+        queries.getOrders(1);
     }
 
 

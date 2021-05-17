@@ -1,8 +1,10 @@
 import com.mysql.cj.protocol.Resultset;
+import jdk.jshell.Snippet;
+
 
 import java.sql.*;
-import java.util.ArrayList;
-
+import java.util.*;
+//https://stackoverflow.com/questions/4956844/hashmap-with-multiple-values-under-the-same-key
 public class SQLqueries {
     private static Connection connection;
 
@@ -21,7 +23,7 @@ public class SQLqueries {
         if(isgeautoriseerd)//CHeck autorisatie?
         {
             //create statement/query
-            String query = "SELECT OrderID FROM orders o INNER JOIN people p ON o.CustomerID=p.PersonID WHERE p.postcode IN (" +
+            String query = "SELECT OrderID FROM orders o INNER JOIN people p ON o.KlantID=p.PersonID WHERE p.postcode IN (" +
                     "SELECT PostCodePK FROM postcode WHERE provincie = ? ) limit 100";
 
             try (
@@ -44,10 +46,121 @@ public class SQLqueries {
         DatabaseConnectie.verbindingSluiten();
     }
 
+    //Voor bezorgroute scherm
+    public ArrayList<ArrayList<String>> getOrders(int routeID){
+        /*
+            Je maakt een route aan.
+            Je maakt een key aan als order in de route.
+            Je maakt dan een lijst van alle producten van de bijbehorende order.
+         */
+
+
+//        String route= "route#"+routeID;
+        // create our map
+        Map<Order, List<Orderline>> route = new HashMap<>();
+
+        // populate it, voor elke bestelling in een route!!
+        //create statement/query
+        String query = "SELECT OrderID FROM orders WHERE RouteID = ? ) limit 100";
+
+        try (
+                //maal er een prepared statment + connectie
+                PreparedStatement stmt = connection.prepareStatement(query))
+        {
+            stmt.setInt(1, routeID);//parameter toevoegen in query
+            try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
+                while(rs.next()) {
+                    System.out.println("OrderID: " + rs.getInt("OrderID"));
+
+                    //per key:value
+                    List<Orderline> bestellingen = new ArrayList<>();
+                    bestellingen.add(new Orderline(73596));
+                    route.put(new Order(rs.getInt("OrderID")), bestellingen);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+        // read from it
+        List<Orderline> bestellingenVanOrder = route[routeID];
+        Orderline bob1 = bestellingenVanOrder[0];
+        Orderline bob2 = bestellingenVanOrder[1];
+
+
+        DatabaseConnectie.verbindingMaken();
+
+
+        ArrayList<String> lijstOrders = new ArrayList<String>(); // maken ArrayList
+
+
+        //haal alle orders op van in een route
+        String query = "SELECT OrderID FROM orders WHERE RouteID=?";
+
+        try (
+                //maal er een prepared statment + connectie
+                PreparedStatement stmt = connection.prepareStatement(query))
+        {
+            stmt.setInt(1, routeID);//parameter toevoegen in query
+            try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
+                while(rs.next()) {
+                    System.out.println("OrderID: " + rs.getInt("OrderID"));
+                    lijstOrders.add("OrderID: " + rs.getInt("OrderID"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+        //haal alle producten op van een order
+        for (String ordernummer:lijstOrders) {
+
+        }
+
+
+        DatabaseConnectie.verbindingSluiten();
+    }
+
+    public ArrayList<String> getOrders(){
+        DatabaseConnectie.verbindingMaken();
+
+        boolean isgeautoriseerd = true;
+        PreparedStatement stmOrders = null;
+        ArrayList<String> lijstOrders = new ArrayList<String>(); // maken ArrayList
+
+
+
+        if(isgeautoriseerd)//CHeck autorisatie?
+        {
+            //create statement/query
+            String query = "SELECT OrderID FROM orders o INNER JOIN people p ON o.KlantID=p.PersonID WHERE p.PersonID =?";
+
+            try (
+                    //maal er een prepared statment + connectie
+                    PreparedStatement stmt = connection.prepareStatement(query))
+            {
+                stmt.setInt(1, personID);//parameter toevoegen in query
+                try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
+                    while(rs.next()) {
+                        System.out.println("OrderID: " + rs.getInt("OrderID"));
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+
+        DatabaseConnectie.verbindingSluiten();
+    }
+
     public void getOrderlines(int orderID){
         DatabaseConnectie.verbindingMaken();
         //create statement/query
-        String query = "SELECT OrderLineID FROM orderlines WHERE OrderID=?";
+        String query = "SELECT OrderLineID, StockItemID FROM orderlines WHERE OrderID=?";
 
         try (
                 //maal er een prepared statment + connectie
@@ -56,7 +169,8 @@ public class SQLqueries {
             stmt.setInt(1, orderID);//parameter toevoegen in query
             try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
                 while(rs.next()) {
-                    System.out.println("OrderLineID: " + rs.getInt("OrderLineID"));
+                    System.out.print("OrderLineID: " + rs.getInt("OrderLineID"));
+                    System.out.println(" ,StockItemID: " + rs.getInt("StockItemID"));
                 }
             }
         } catch (SQLException e) {
@@ -66,39 +180,81 @@ public class SQLqueries {
 
     }
 
-    public void getRoutes(String status){
+    //routes ophalen voor het overzicht
+    public void getRoutes(){
 //        connection=DatabaseConnectie.getConnection();
-        //create statement/query
-        String query = "SELECT RouteID, Provincie, Status From route WHERE Status=?";
-        String[] routes= new String[5];//max aantal routes per pagina?anders arraylist gebruiken
-        int iterationNum=0;
+        boolean isgeautoriseerd = true;
+        boolean isSorteerder= true;
+        boolean isBezorger = false;
+        boolean isManager = false;
+        String[] routes = new String[5];//max aantal routes per pagina?anders arraylist gebruiken
+        String status;
 
-        try (
-                //maal er een prepared statment + connectie
-                PreparedStatement stmt = this.connection.prepareStatement(query))
+        if(isgeautoriseerd)//Check autorisatie?
         {
-            stmt.setString(1, status);//parameter toevoegen in query
-            try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
-                while(rs.next()) {
-                    String routeZin = "RouteID: " + rs.getInt("RouteID") + ", Provincie: " + rs.getString("Provincie") + ", Status: " + rs.getString("Status");
-                    routes[iterationNum]= routeZin;
-                    iterationNum++;
+            //create statement/query
+            String query = "SELECT RouteID, Provincie, Status, AantalPakketten, ReisTijd, Afstand From route WHERE Status=?";
+            int iterationNum = 0;
+
+
+            if(isSorteerder){
+                status= "Klaar voor sorteren";
+            }else if(isBezorger){
+                status = "Klaar voor bezorging";
+            }else{
+                //als het dus de manager is
+                status = "'Klaar voor sorteren', 'Klaar voor bezorging'";
+                query = "SELECT RouteID, Provincie, Status, AantalPakketten From route WHERE Status IN (?)";
+            }
+
+
+            //maak er een prepared statment + connectie
+            try (PreparedStatement stmRoutes  = this.connection.prepareStatement(query)) {
+                stmRoutes.setString(1, status);//parameter toevoegen in query
+
+                //data ontvangen---------------------
+                try (ResultSet rs = stmRoutes.executeQuery()) {
+                    while (rs.next()) {
+                        String routeZin = "";
+
+                        if(isSorteerder){
+                            routeZin = "RouteID: " + rs.getInt("RouteID")  + ", Status: " + rs.getString("Status") + ", aantal pakketten: " + rs.getInt("AantalPakketten");
+                        }else{
+                            routeZin = "RouteID: " + rs.getInt("RouteID") + ", Provincie: " + rs.getString("Provincie") + ", Status: " + rs.getString("Status")+ ", reistijd: " + rs.getString("ReisTijd") + ", Afstand: " + rs.getString("Afstand");
+                        }
+
+                        routes[iterationNum] = routeZin;
+                        iterationNum++;
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+            DatabaseConnectie.verbindingSluiten();
+
+            //laat opgehaalde gegevens zien
+            for (int i = 0; i < routes.length; i++) {
+                //laat alleen de routes zien
+                if(routes[i] != null){
+                    System.out.println(routes[i]);
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        DatabaseConnectie.verbindingSluiten();
-
-        //laat opgehaalde gegevens zien
-        for (int i = 0; i < routes.length; i++) {
-            System.out.println(routes[i]);
-        }
     }
 
-    public void getpeople(int personID){//kan nu dus nog maar 1 persoon ophalen
+    public void showRoute(int routeNummer){
+        String beginEindPunt= "Centrale opslag NerdyGadgets";
+        String[] route= new String[5];
+        route[0]= beginEindPunt;
+
+        String[] orders= getOrders(routeNummer);
+    }
+
+    //gegevens van één persoon ophalen
+    public void getpeople(int personID){
+        //kan nu dus nog maar 1 persoon ophalen
 //+postcode, dus met postcode tabel
-        String query = "SELECT PersonID, FullName, isStockManager, isStockSorter, isDeliverer, Emailaddress, PhoneNumber, pe.postcode, po.provincie FROM people pe INNER JOIN postcode po ON pe.postcode=po.PostCodePK WHERE PersonID=?";
+        String query = "SELECT PersonID, FullName, isStockManager, isStockSorter, isDeliverer, Emailaddress, PhoneNumber, pe.postcode, po.provincie, po.Longitude, po.Latitude FROM people pe INNER JOIN postcode po ON pe.postcode=po.PostCodePK WHERE PersonID=?";
         ArrayList<String> persoon = new ArrayList<String>();
 
         try (
@@ -113,7 +269,7 @@ public class SQLqueries {
 //                    System.out.print(", Emailadress: " + rs.getString("Emailaddress"));
 //                    System.out.print(", provincie: " + rs.getString("Provincie"));
 //                    System.out.println(", postcode: " + rs.getString("postcode"));
-                    String persoonsGegevens= "PersonID: " + rs.getInt("PersonID") + ", Fullname: " + rs.getString("FullName") + ", Emailadress: " + rs.getString("Emailaddress")+ ", provincie: " + rs.getString("Provincie")+ ", postcode: " + rs.getString("postcode");
+                    String persoonsGegevens= "PersonID: " + rs.getInt("PersonID") + ", Fullname: " + rs.getString("FullName") + ", Emailadress: " + rs.getString("Emailaddress")+ ", provincie: " + rs.getString("Provincie")+ ", postcode: " + rs.getString("postcode") + ", longitude:latitude: " + rs.getString("Longitude")+" : " + rs.getString("Latitude");
                     persoon.add(persoonsGegevens);
                 }
             }
@@ -125,6 +281,7 @@ public class SQLqueries {
         //laat opgehaalde gegevens zien
         System.out.println(persoon);
     }
+
     public void getRoutelines(int routeID){
         DatabaseConnectie.verbindingMaken();
         String query = "SELECT * FROM routelines WHERE RouteID=?";
@@ -172,4 +329,5 @@ public class SQLqueries {
         DatabaseConnectie.verbindingSluiten();
 
     }
+
 }
