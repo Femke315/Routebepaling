@@ -6,7 +6,7 @@ ADD postcode varchar(20) Not null;
 
 /*Toevoegen route kolom in orders*/
 ALTER TABLE orders
-ADD column RouteID int null, ADD Status varchar(50) null;
+ADD column RouteID int null, ADD Status varchar(50) null, add klantID int(11) not null ;
 
 
 use nerdygadgets;
@@ -147,7 +147,7 @@ CREATE TABLE routelines
     RouteID int not null,
     VolgordeID int not null,
     OrderID int not null,
-    CONSTRAINT PK_route PRIMARY KEY (RouteID, VolgordeID, OrderID),
+    CONSTRAINT PK_route PRIMARY KEY (RouteID, VolgordeID),
     CONSTRAINT FK_RouteRouteline FOREIGN KEY (RouteID) REFERENCES route(RouteID),
     CONSTRAINT FK_OrderRouteline FOREIGN KEY (OrderID) REFERENCES orders(OrderID)    
 );
