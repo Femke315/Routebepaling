@@ -4,17 +4,14 @@ import jdk.jshell.Snippet;
 
 import java.sql.*;
 import java.util.*;
-//https://stackoverflow.com/questions/4956844/hashmap-with-multiple-values-under-the-same-key
+
+
 public class SQLqueries {
     private static Connection connection;
 
-    public SQLqueries(){
-        this.connection=DatabaseConnectie.getConnection();
-    }
-
     //ongeordende lijst met alle routes in een provincie
     public void getOrdersVanProvincie(String provincie){
-        DatabaseConnectie.verbindingMaken();
+        connection=DatabaseConnectie.getConnection();
 
         boolean isgeautoriseerd = true;
 
@@ -45,9 +42,9 @@ public class SQLqueries {
         DatabaseConnectie.verbindingSluiten();
     }
 
-    //routes ophalen voor het routeoverzicht
+    //De geordende lijst van routes ophalen voor het routeoverzicht
     public void getRoutes(){
-//        connection=DatabaseConnectie.getConnection();
+        connection=DatabaseConnectie.getConnection();
         boolean isgeautoriseerd = true;
         boolean isSorteerder= true;
         boolean isBezorger = false;
@@ -74,7 +71,7 @@ public class SQLqueries {
 
 
             //maak er een prepared statment + connectie
-            try (PreparedStatement stmRoutes  = this.connection.prepareStatement(query)) {
+            try (PreparedStatement stmRoutes  = connection.prepareStatement(query)) {
                 stmRoutes.setString(1, status);//parameter toevoegen in query
 
                 //data ontvangen---------------------
@@ -109,6 +106,7 @@ public class SQLqueries {
 
     //functie om één route te laten zien
     public void showRoute(int routeID){
+        connection=DatabaseConnectie.getConnection();
         String beginEindPunt= "Centrale opslag NerdyGadgets";
         ArrayList<String> route= new ArrayList<String>();
         route.add(beginEindPunt);
@@ -139,9 +137,68 @@ public class SQLqueries {
     }
 
 
-    //-------------------------------------------------------------------------------------------
+    //Andere hulp methodes-------------------------------------------------------------------------------------------
+    public void getProducts(int productID){
+        connection=DatabaseConnectie.getConnection();
+        //+voorraad, dus met stockitemholdings tabel
+        String query = " SELECT si.StockitemID, si.StockItemName, QuantityOnHand From StockItems si LEFT JOIN stockitemholdings sh ON si.StockItemID=sh.StockItemID WHERE si.StockitemID=?";
+
+        try (//try with resource close statements
+             //maak er een prepared statment + connectie
+             PreparedStatement stmt = connection.prepareStatement(query))
+        {
+            stmt.setInt(1, productID);//parameter toevoegen in query
+            try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
+                while(rs.next()) {
+                    System.out.print("StockitemID: " + rs.getInt("StockitemID"));
+                    System.out.print(", description: " + rs.getString("StockItemName"));
+                    System.out.println(", QuantityOnHand: " + rs.getInt("QuantityOnHand"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        DatabaseConnectie.verbindingSluiten();
+
+    }
+
+    //gegevens van één persoon ophalen voor accountpagina
+    public void getpeople(int personID){
+        connection=DatabaseConnectie.getConnection();
+
+        String query = "SELECT PersonID, FullName, isStockManager, isStockSorter, isDeliverer, Emailaddress, PhoneNumber, pe.postcode, po.provincie, po.Longitude, po.Latitude FROM people pe INNER JOIN postcode po ON pe.postcode=po.PostCodePK WHERE PersonID=?";
+        ArrayList<String> persoon = new ArrayList<String>();
+
+        try (
+                //maal er een prepared statment + connectie
+                PreparedStatement stmt = connection.prepareStatement(query))
+        {
+            stmt.setInt(1, personID);//parameter toevoegen in query
+            try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
+                while(rs.next()) {
+//                    System.out.print("PersonID: " + rs.getInt("PersonID"));
+//                    System.out.print(", Fullname: " + rs.getString("FullName"));
+//                    System.out.print(", Emailadress: " + rs.getString("Emailaddress"));
+//                    System.out.print(", provincie: " + rs.getString("Provincie"));
+//                    System.out.println(", postcode: " + rs.getString("postcode"));
+                    String persoonsGegevens= "PersonID: " + rs.getInt("PersonID") + ", Fullname: " + rs.getString("FullName") + ", Emailadress: " + rs.getString("Emailaddress")+ ", provincie: " + rs.getString("Provincie")+ ", postcode: " + rs.getString("postcode") + ", longitude:latitude: " + rs.getString("Longitude")+" : " + rs.getString("Latitude");
+                    persoon.add(persoonsGegevens);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        DatabaseConnectie.verbindingSluiten();
+
+        //laat opgehaalde gegevens zien
+        System.out.println(persoon);
+    }
+
+
+
     //Voor bezorgroute scherm
-    public ArrayList<ArrayList<String>> getOrders(int routeID){
+    /*public ArrayList<ArrayList<String>> getOrders(int routeID){
 
 
 //        String route= "route#"+routeID;
@@ -210,7 +267,7 @@ public class SQLqueries {
 
 
         DatabaseConnectie.verbindingSluiten();
-    }
+    }*/
 
     public void getOrders(int personID){
         DatabaseConnectie.verbindingMaken();
@@ -270,38 +327,6 @@ public class SQLqueries {
     }
 
 
-    //gegevens van één persoon ophalen
-    public void getpeople(int personID){
-        //kan nu dus nog maar 1 persoon ophalen
-//+postcode, dus met postcode tabel
-        String query = "SELECT PersonID, FullName, isStockManager, isStockSorter, isDeliverer, Emailaddress, PhoneNumber, pe.postcode, po.provincie, po.Longitude, po.Latitude FROM people pe INNER JOIN postcode po ON pe.postcode=po.PostCodePK WHERE PersonID=?";
-        ArrayList<String> persoon = new ArrayList<String>();
-
-        try (
-                //maal er een prepared statment + connectie
-                PreparedStatement stmt = this.connection.prepareStatement(query))
-        {
-            stmt.setInt(1, personID);//parameter toevoegen in query
-            try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
-                while(rs.next()) {
-//                    System.out.print("PersonID: " + rs.getInt("PersonID"));
-//                    System.out.print(", Fullname: " + rs.getString("FullName"));
-//                    System.out.print(", Emailadress: " + rs.getString("Emailaddress"));
-//                    System.out.print(", provincie: " + rs.getString("Provincie"));
-//                    System.out.println(", postcode: " + rs.getString("postcode"));
-                    String persoonsGegevens= "PersonID: " + rs.getInt("PersonID") + ", Fullname: " + rs.getString("FullName") + ", Emailadress: " + rs.getString("Emailaddress")+ ", provincie: " + rs.getString("Provincie")+ ", postcode: " + rs.getString("postcode") + ", longitude:latitude: " + rs.getString("Longitude")+" : " + rs.getString("Latitude");
-                    persoon.add(persoonsGegevens);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        DatabaseConnectie.verbindingSluiten();
-
-        //laat opgehaalde gegevens zien
-        System.out.println(persoon);
-    }
-
     public void getRoutelines(int routeID){
         DatabaseConnectie.verbindingMaken();
         String query = "SELECT * FROM routelines WHERE RouteID=?";
@@ -325,29 +350,6 @@ public class SQLqueries {
 
     }
 
-    public void getProducts(int productID){
-        connection=DatabaseConnectie.getConnection();
-        //+voorraad, dus met stockitemholdings tabel
-        String query = " SELECT si.StockitemID, si.StockItemName, QuantityOnHand From StockItems si LEFT JOIN stockitemholdings sh ON si.StockItemID=sh.StockItemID WHERE si.StockitemID=?";
 
-        try (//try with resource close statements
-                //maak er een prepared statment + connectie
-                PreparedStatement stmt = connection.prepareStatement(query))
-        {
-            stmt.setInt(1, productID);//parameter toevoegen in query
-            try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
-                while(rs.next()) {
-                    System.out.print("StockitemID: " + rs.getInt("StockitemID"));
-                    System.out.print(", description: " + rs.getString("StockItemName"));
-                    System.out.println(", QuantityOnHand: " + rs.getInt("QuantityOnHand"));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        DatabaseConnectie.verbindingSluiten();
-
-    }
 
 }

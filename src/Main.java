@@ -20,11 +20,20 @@ public class Main {
 //        HoofdschermGUI Scherm = new HoofdschermGUI();
 
         SQLqueries queries= new SQLqueries();//connectie wordt hierin gemaakt
-//        queries.getProducts(37);//test getProduct()
-//        queries.getRoutes();
-//        queries.getpeople(3146);//Connectie wordt hierin gesloten
+        queries.getProducts(37);//test getProduct()
+        System.out.println("\n\n");
+
+        queries.getRoutes();
+        System.out.println("\n\n");
+        queries.getpeople(3146);//Connectie wordt hierin gesloten
+        System.out.println("\n\n");
+
 //        queries.getOrderlines(73596);
 //        queries.getOrders(1);
+        queries.getOrdersVanProvincie("Groningen");
+        queries.getOrdersVanProvincie("Overijssel");
+        System.out.println("\n\n");
+
 
         queries.showRoute(1);
     }
