@@ -1,6 +1,7 @@
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.*;
 
 public class Main {
 
@@ -23,7 +24,9 @@ public class Main {
 //        queries.getRoutes();
 //        queries.getpeople(3146);//Connectie wordt hierin gesloten
 //        queries.getOrderlines(73596);
-        queries.getOrders(1);
+//        queries.getOrders(1);
+
+        queries.showRoute(1);
     }
 
 

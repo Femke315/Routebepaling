@@ -12,15 +12,14 @@ public class SQLqueries {
         this.connection=DatabaseConnectie.getConnection();
     }
 
-    public void getOrders(String provincie){
+    //ongeordende lijst met alle routes in een provincie
+    public void getOrdersVanProvincie(String provincie){
         DatabaseConnectie.verbindingMaken();
 
         boolean isgeautoriseerd = true;
-        PreparedStatement stmOrders = null;
 
 
-
-        if(isgeautoriseerd)//CHeck autorisatie?
+        if(isgeautoriseerd)//Check autorisatie?
         {
             //create statement/query
             String query = "SELECT OrderID FROM orders o INNER JOIN people p ON o.KlantID=p.PersonID WHERE p.postcode IN (" +
@@ -46,13 +45,103 @@ public class SQLqueries {
         DatabaseConnectie.verbindingSluiten();
     }
 
+    //routes ophalen voor het routeoverzicht
+    public void getRoutes(){
+//        connection=DatabaseConnectie.getConnection();
+        boolean isgeautoriseerd = true;
+        boolean isSorteerder= true;
+        boolean isBezorger = false;
+        boolean isManager = false;
+        String[] routes = new String[5];//max aantal routes per pagina?anders arraylist gebruiken
+        String status;
+
+        if(isgeautoriseerd)//Check autorisatie?
+        {
+            //create statement/query
+            String query = "SELECT RouteID, Provincie, Status, AantalPakketten, ReisTijd, Afstand From route WHERE Status=?";
+            int iterationNum = 0;
+
+
+            if(isSorteerder){
+                status= "Klaar voor sorteren";
+            }else if(isBezorger){
+                status = "Klaar voor bezorging";
+            }else{
+                //als het dus de manager is
+                status = "'Klaar voor sorteren', 'Klaar voor bezorging'";
+                query = "SELECT RouteID, Provincie, Status, AantalPakketten From route WHERE Status IN (?)";
+            }
+
+
+            //maak er een prepared statment + connectie
+            try (PreparedStatement stmRoutes  = this.connection.prepareStatement(query)) {
+                stmRoutes.setString(1, status);//parameter toevoegen in query
+
+                //data ontvangen---------------------
+                try (ResultSet rs = stmRoutes.executeQuery()) {
+                    while (rs.next()) {
+                        String routeZin = "";
+
+                        if(isSorteerder){
+                            routeZin = "RouteID: " + rs.getInt("RouteID")  + ", Status: " + rs.getString("Status") + ", aantal pakketten: " + rs.getInt("AantalPakketten");
+                        }else{
+                            routeZin = "RouteID: " + rs.getInt("RouteID") + ", Provincie: " + rs.getString("Provincie") + ", Status: " + rs.getString("Status")+ ", reistijd: " + rs.getString("ReisTijd") + ", Afstand: " + rs.getString("Afstand");
+                        }
+
+                        routes[iterationNum] = routeZin;
+                        iterationNum++;
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        DatabaseConnectie.verbindingSluiten();
+
+        //laat opgehaalde gegevens zien
+        for (int i = 0; i < routes.length; i++) {
+            //laat alleen de routes zien
+            if(routes[i] != null){
+                System.out.println(routes[i]);
+            }
+        }
+    }
+
+    //functie om één route te laten zien
+    public void showRoute(int routeID){
+        String beginEindPunt= "Centrale opslag NerdyGadgets";
+        ArrayList<String> route= new ArrayList<String>();
+        route.add(beginEindPunt);
+
+        String query = "SELECT o.OrderID, volgordeID FROM orders o INNER JOIN routelines r ON o.OrderID=r.OrderID WHERE r.RouteID=?";
+
+        try (
+                //maal er een prepared statment + connectie
+                PreparedStatement stmt = connection.prepareStatement(query))
+        {
+            stmt.setInt(1, routeID);//parameter toevoegen in query
+            try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
+                while(rs.next()) {
+                    System.out.println("Opgehaald OrderID: " + rs.getInt("OrderID"));
+                    //order toevoegen op een specifieke index
+                    route.add(rs.getInt("volgordeID"), "OrderID: " + rs.getInt("OrderID"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            route.add(beginEindPunt);
+        }
+
+
+        System.out.println(route);
+        DatabaseConnectie.verbindingSluiten();
+    }
+
+
+    //-------------------------------------------------------------------------------------------
     //Voor bezorgroute scherm
     public ArrayList<ArrayList<String>> getOrders(int routeID){
-        /*
-            Je maakt een route aan.
-            Je maakt een key aan als order in de route.
-            Je maakt dan een lijst van alle producten van de bijbehorende order.
-         */
 
 
 //        String route= "route#"+routeID;
@@ -123,7 +212,7 @@ public class SQLqueries {
         DatabaseConnectie.verbindingSluiten();
     }
 
-    public ArrayList<String> getOrders(){
+    public void getOrders(int personID){
         DatabaseConnectie.verbindingMaken();
 
         boolean isgeautoriseerd = true;
@@ -180,75 +269,6 @@ public class SQLqueries {
 
     }
 
-    //routes ophalen voor het overzicht
-    public void getRoutes(){
-//        connection=DatabaseConnectie.getConnection();
-        boolean isgeautoriseerd = true;
-        boolean isSorteerder= true;
-        boolean isBezorger = false;
-        boolean isManager = false;
-        String[] routes = new String[5];//max aantal routes per pagina?anders arraylist gebruiken
-        String status;
-
-        if(isgeautoriseerd)//Check autorisatie?
-        {
-            //create statement/query
-            String query = "SELECT RouteID, Provincie, Status, AantalPakketten, ReisTijd, Afstand From route WHERE Status=?";
-            int iterationNum = 0;
-
-
-            if(isSorteerder){
-                status= "Klaar voor sorteren";
-            }else if(isBezorger){
-                status = "Klaar voor bezorging";
-            }else{
-                //als het dus de manager is
-                status = "'Klaar voor sorteren', 'Klaar voor bezorging'";
-                query = "SELECT RouteID, Provincie, Status, AantalPakketten From route WHERE Status IN (?)";
-            }
-
-
-            //maak er een prepared statment + connectie
-            try (PreparedStatement stmRoutes  = this.connection.prepareStatement(query)) {
-                stmRoutes.setString(1, status);//parameter toevoegen in query
-
-                //data ontvangen---------------------
-                try (ResultSet rs = stmRoutes.executeQuery()) {
-                    while (rs.next()) {
-                        String routeZin = "";
-
-                        if(isSorteerder){
-                            routeZin = "RouteID: " + rs.getInt("RouteID")  + ", Status: " + rs.getString("Status") + ", aantal pakketten: " + rs.getInt("AantalPakketten");
-                        }else{
-                            routeZin = "RouteID: " + rs.getInt("RouteID") + ", Provincie: " + rs.getString("Provincie") + ", Status: " + rs.getString("Status")+ ", reistijd: " + rs.getString("ReisTijd") + ", Afstand: " + rs.getString("Afstand");
-                        }
-
-                        routes[iterationNum] = routeZin;
-                        iterationNum++;
-                    }
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-            DatabaseConnectie.verbindingSluiten();
-
-            //laat opgehaalde gegevens zien
-            for (int i = 0; i < routes.length; i++) {
-                //laat alleen de routes zien
-                if(routes[i] != null){
-                    System.out.println(routes[i]);
-                }
-            }
-    }
-
-    public void showRoute(int routeNummer){
-        String beginEindPunt= "Centrale opslag NerdyGadgets";
-        String[] route= new String[5];
-        route[0]= beginEindPunt;
-
-        String[] orders= getOrders(routeNummer);
-    }
 
     //gegevens van één persoon ophalen
     public void getpeople(int personID){
