@@ -25,7 +25,7 @@ public class Main {
 
         queries.getRoutes();
         System.out.println("\n\n");
-        queries.getpeople(3146);//Connectie wordt hierin gesloten
+        queries.getPerson(3146);//Connectie wordt hierin gesloten
         System.out.println("\n\n");
 
 //        queries.getOrderlines(73596);

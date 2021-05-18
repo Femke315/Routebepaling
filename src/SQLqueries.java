@@ -164,7 +164,7 @@ public class SQLqueries {
     }
 
     //gegevens van één persoon ophalen voor accountpagina
-    public void getpeople(int personID){
+    public void getPerson(int personID){
         connection=DatabaseConnectie.getConnection();
 
         String query = "SELECT PersonID, FullName, isStockManager, isStockSorter, isDeliverer, Emailaddress, PhoneNumber, pe.postcode, po.provincie, po.Longitude, po.Latitude FROM people pe INNER JOIN postcode po ON pe.postcode=po.PostCodePK WHERE PersonID=?";
