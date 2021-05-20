@@ -97,9 +97,7 @@ public class SQLqueries {
     //functie om één route te laten zien
     public ArrayList<String> showRoute(int routeID){
         connection=DatabaseConnectie.getConnection();
-        String beginEindPunt= "Centrale opslag NerdyGadgets";
         ArrayList<String> route= new ArrayList<String>();
-        route.add(beginEindPunt);
 
         String query = "SELECT o.OrderID, volgordeID FROM orders o INNER JOIN routelines r ON o.OrderID=r.OrderID WHERE r.RouteID=?";
 
@@ -118,13 +116,39 @@ public class SQLqueries {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        }finally {
-            route.add(beginEindPunt);
         }
 
         DatabaseConnectie.verbindingSluiten();
 
         return route;
+    }
+
+    //berekende route in database opslaan in een transactie
+    public void toevoegenRoute(ArrayList<Order> route) throws SQLException {
+        connection= DatabaseConnectie.getConnection();
+
+        /*
+        * Een route aanmaken
+        *
+        *
+        * */
+
+
+        String stmt= "";
+
+        try {
+            connection.setAutoCommit(false);
+            PreparedStatement firstStatement = connection .prepareStatement("firstQuery");
+            firstStatement.executeUpdate();
+            PreparedStatement secondStatement = connection .prepareStatement("secondQuery");
+            secondStatement.executeUpdate();
+            connection.commit();
+        } catch(SQLException sqle){
+            connection.rollback();
+            sqle.getCause();
+        }
+
+        DatabaseConnectie.verbindingSluiten();
     }
 
 }

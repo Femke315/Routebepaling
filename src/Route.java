@@ -15,6 +15,7 @@ public class Route {
     
     Order[] Route;
 
+    //we moeten nog bepalen waar een route wordt gemaakt in de database en in object
     public Route(int routeID, String provincie, String status, int aantalPakketten, double reisTijd, int afstand, String opmerkingen) {
         this.routeID=routeID;
         this.provincie=provincie;

@@ -38,7 +38,7 @@ public class Order {
         }
 
 
-        //----------------------------------------------------------------------------
+        //---------------------------------------------------------------------------------------
         //create statement/query
         String stmtGetLocatie = "SELECT po.PostCodePK, Latitude, Longitude FROM postcode po INNER JOIN people pe ON po.PostCodePK=pe.postcode WHERE pe.PersonID=?";
 
