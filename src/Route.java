@@ -1,4 +1,4 @@
-package src;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,7 +7,7 @@ public class Route {
     private int routeID;
     private int personID;
     private int aantalPakketten;
-    private int reistijd;
+    private double reistijd;
     private int afstand;
     private String provincie;
     private String status;
@@ -15,17 +15,14 @@ public class Route {
     
     Order[] Route;
 
-
-    // Constructor met alle gegevens
-    public Route(int routeID, int personID, int aantalPakketten, int reistijd, int afstand, String provincie, String status, String opmerkingen){
-        this.routeID = routeID;
-        this.personID = personID;
-        this.aantalPakketten = aantalPakketten;
-        this.reistijd = reistijd;
-        this.afstand = afstand;
-        this.provincie = provincie;
-        this.status = status;
-        this.opmerkingen = opmerkingen;
+    public Route(int routeID, String provincie, String status, int aantalPakketten, double reisTijd, int afstand, String opmerkingen) {
+        this.routeID=routeID;
+        this.provincie=provincie;
+        this.aantalPakketten=aantalPakketten;
+        this.status=status;
+        this.reistijd=reisTijd;
+        this.afstand=afstand;
+        this.opmerkingen=opmerkingen;
     }
 
     public int getRouteID() {
@@ -40,7 +37,7 @@ public class Route {
         return aantalPakketten;
     }
 
-    public int getReistijd() {
+    public double getReistijd() {
         return reistijd;
     }
 
@@ -156,7 +153,7 @@ public class Route {
 
     }
 
-    //simpele methode om een Route snel te weergeven
+//    simpele methode om een Route snel te weergeven
     public void printRoute() {
         for (int i = 0; i < Route.length; i++) {
             System.out.println("Volgordenummer: " + i + ". OrderID = " + Route[i].orderID);

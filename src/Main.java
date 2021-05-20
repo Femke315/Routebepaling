@@ -22,11 +22,11 @@ public class Main {
         SQLqueries queries= new SQLqueries();//connectie wordt hierin gemaakt
 
         //methodes testen van SQLqueries file
-        ArrayList<String> geordendeRoutes =  queries.getRoutesMetArray("Klaar voor sorteren");
-        for (String route:geordendeRoutes) {
-            System.out.println(route);
-        }
-        System.out.println("\n\n");
+//        ArrayList<String> geordendeRoutes =  queries.getRoutesMetArray("Klaar voor sorteren");
+//        for (String route:geordendeRoutes) {
+//            System.out.println(route);
+//        }
+
 
 
 //        ArrayList<String> lijst = queries.getOrdersVanProvincieMetArray("Groningen");

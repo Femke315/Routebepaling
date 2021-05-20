@@ -32,7 +32,7 @@ public class SQLqueries {
 
     //voor het algoritme
     //ongeordende lijst met alle routes in een provincie
-    public ArrayList<Order> getOrdersVanProvincieMetArray(String provincie){
+    public ArrayList<Order> getOrdersVanProvincie(String provincie){
         connection=DatabaseConnectie.getConnection();
         ArrayList<Order> ordersLijst= new ArrayList<>();
 
@@ -66,17 +66,16 @@ public class SQLqueries {
         return ordersLijst;
     }
 
-    //De geordende lijst van routes ophalen voor het routeoverzicht
-    public ArrayList<Route> getRoutesMetArray(String status){
+    //De al geordende lijst van routes ophalen voor het routeoverzicht
+    public ArrayList<Route> getRoutes(String status){
         connection=DatabaseConnectie.getConnection();
-        ArrayList<String> routes= new ArrayList<>();
+        ArrayList<Route> routes= new ArrayList<>();
 
         if(true)//Check autorisatie met distributiemedewerker
         {
             //create statement/query
-            String query = "SELECT RouteID, Provincie, Status, AantalPakketten, ReisTijd, Afstand From route WHERE Status=?";
+            String query = "SELECT RouteID, Provincie, Status, AantalPakketten, ReisTijd, Afstand, Opmerkingen From route WHERE Status=?";
 
-            status= "afgerond";
             //maak er een prepared statment + connectie
             try (PreparedStatement stmRoutes  = connection.prepareStatement(query)) {
                 stmRoutes.setString(1, status);//parameter toevoegen in query
@@ -84,17 +83,8 @@ public class SQLqueries {
                 //data ontvangen---------------------
                 try (ResultSet rs = stmRoutes.executeQuery()) {
                     while (rs.next()) {
-                        String routeZin = "";
-
-                        //route object hier gebruiken!
-                        if(true){
-                            //route objecten
-                            routeZin = "RouteID: " + rs.getInt("RouteID")  + ", Status: " + rs.getString("Status") + ", aantal pakketten: " + rs.getInt("AantalPakketten");
-                        }else{
-                            routeZin = "RouteID: " + rs.getInt("RouteID") + ", Provincie: " + rs.getString("Provincie") + ", Status: " + rs.getString("Status")+ ", reistijd: " + rs.getString("ReisTijd") + ", Afstand: " + rs.getString("Afstand");
-                        }
-
-                        routes.add(new Route(rs.getInt("RouteID"), rs.getString("Provincie"), rs.getString("Status"), rs.getInt("AantalPakketten"), rs.getInt("ReisTijd"), rs.getInt("Afstand")));
+                        //voeg de route object toe aan arraylist
+                        routes.add(new Route(rs.getInt("RouteID"), rs.getString("Provincie"), rs.getString("Status"), rs.getInt("AantalPakketten"), rs.getDouble("ReisTijd"), rs.getInt("Afstand"), rs.getString("Opmerkingen")));
                     }
                 }
             } catch (SQLException e) {
@@ -106,7 +96,7 @@ public class SQLqueries {
     }
 
     //functie om één route te laten zien
-    public ArrayList<String> showRouteMetArray(int routeID){
+    public ArrayList<String> showRoute(int routeID){
         connection=DatabaseConnectie.getConnection();
         String beginEindPunt= "Centrale opslag NerdyGadgets";
         ArrayList<String> route= new ArrayList<String>();
