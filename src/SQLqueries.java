@@ -5,7 +5,7 @@ import java.util.*;
 
 public class SQLqueries {
     private static Connection connection;
-
+    //product informatie ophalen
     public void getProducts(int productID){
         connection=DatabaseConnectie.getConnection();
         //+voorraad, dus met stockitemholdings tabel
@@ -67,7 +67,7 @@ public class SQLqueries {
     }
 
     //De geordende lijst van routes ophalen voor het routeoverzicht
-    public ArrayList<String> getRoutesMetArray(String status){
+    public ArrayList<Route> getRoutesMetArray(String status){
         connection=DatabaseConnectie.getConnection();
         ArrayList<String> routes= new ArrayList<>();
 
@@ -94,7 +94,7 @@ public class SQLqueries {
                             routeZin = "RouteID: " + rs.getInt("RouteID") + ", Provincie: " + rs.getString("Provincie") + ", Status: " + rs.getString("Status")+ ", reistijd: " + rs.getString("ReisTijd") + ", Afstand: " + rs.getString("Afstand");
                         }
 
-                        routes.add(routeZin);
+                        routes.add(new Route(rs.getInt("RouteID"), rs.getString("Provincie"), rs.getString("Status"), rs.getInt("AantalPakketten"), rs.getInt("ReisTijd"), rs.getInt("Afstand")));
                     }
                 }
             } catch (SQLException e) {
@@ -137,6 +137,5 @@ public class SQLqueries {
 
         return route;
     }
-
 
 }
