@@ -27,8 +27,6 @@ public class Orderline {
             //ontvangen data
             try (ResultSet rs = stmt.executeQuery()) {
                 while(rs.next()) {
-                    System.out.print("OrderLineID: " + rs.getInt("OrderLineID"));
-
                     this.orderlineID= rs.getInt("OrderLineID");
                     this.stockitemID= rs.getInt("StockItemID");
                     this.quantity= rs.getInt("Quantity");

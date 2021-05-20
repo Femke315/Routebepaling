@@ -30,15 +30,16 @@ public class Main {
 
 
         ArrayList<String> lijst = queries.getOrdersVanProvincieMetArray("Groningen");
+        System.out.print("proinvice Groningen:");
         for (String order:lijst) {
             System.out.println(order);
         }
         System.out.println("\n\n");
 
-        ArrayList<String> route = queries.showRouteMetArray(1);
-        for (String bestelling: route) {
-            System.out.println(bestelling);
-        }
+//        ArrayList<String> route = queries.showRouteMetArray(1);
+//        for (String bestelling: route) {
+//            System.out.println(bestelling);
+//        }
     }
 
 
