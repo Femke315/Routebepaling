@@ -128,20 +128,44 @@ public class SQLqueries {
         connection= DatabaseConnectie.getConnection();
 
         /*
-        * Een route aanmaken
-        *
-        *
+        *Een route in deze methode aanmaken (dus alle not-null kolommen invullen van de route tabel)
+        *route tabel HELEMAAL opslot zetten
+        *Laatst toegevoegde routeID ophalen.
+        *routeID toevoegen aan orders + lastEditedWhen aanpassen + Status veranderen (klaar voor sorteren)
+        *routelines toevoegen met behulp van de index van de arraylist, routeID en orderid.
+        *Alle tabellen weer openen.
         * */
 
 
-        String stmt= "";
+        String toevoegenRoute = "INSERT INTO route (AantalPakketten, Afstand, Status) VALUES (?,?,?)";
+        String locktabellen= "LOCK TABLE route, orders, routelines WRITE";//dieper in kijken of deze lock nodig is
+        String ophalenRouteID= "SELECT MAX(RouteID) FROM route";
+        String aanpassenOrder="UPDATE orders SET LastEditedWhen=?, routeID=?, Status= 'Klaar voor sorteren' WHERE OrderID=?";
+        String toevoegenRouteline= "INSERT INTO Routelines (VolgordeID, RouteID, OrderID) VALUES (?,?,?)";
+        String openTabellen= "UNLOCK TABLES";
 
         try {
             connection.setAutoCommit(false);
-            PreparedStatement firstStatement = connection .prepareStatement("firstQuery");
-            firstStatement.executeUpdate();
-            PreparedStatement secondStatement = connection .prepareStatement("secondQuery");
-            secondStatement.executeUpdate();
+            PreparedStatement firstStatement = connection.prepareStatement(toevoegenRoute);
+            firstStatement.setInt(1, aantalpakketten?);//HIER NOG NAAR KIJKEN
+            firstStatement.setDouble(2, afstand?);
+            firstStatement.setString(3, "Klaar voor sorteren");
+            firstStatement.execute();
+
+
+            PreparedStatement secondStatement = connection.prepareStatement(locktabellen);
+            secondStatement.execute();
+
+
+            PreparedStatement thirdStatement = connection.prepareStatement(ophalenRouteID);
+            thirdStatement.execute();//ROUTEID OPHALEN
+
+
+            PreparedStatement fourthStatement = connection.prepareStatement(aanpassenOrder);
+            fourthStatement.executeUpdate();
+
+            PreparedStatement fifthStatement = connection.prepareStatement("secondQuery");
+            fifthStatement.executeUpdate();
             connection.commit();
         } catch(SQLException sqle){
             connection.rollback();
