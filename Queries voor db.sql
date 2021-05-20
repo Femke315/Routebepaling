@@ -37,7 +37,7 @@ CREATE TABLE route
     PersonID int NULL,
     AantalPakketten int not null,
     Reistijd decimal(3,2),
-    Afstand Varchar(10) not null,
+    Afstand double not null,
     Provincie varchar(45) not null,
     Status varchar(50) Not null,
     Opmerkingen varchar(200) null,
