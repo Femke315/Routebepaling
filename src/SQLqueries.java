@@ -71,26 +71,25 @@ public class SQLqueries {
         connection=DatabaseConnectie.getConnection();
         ArrayList<Route> routes= new ArrayList<>();
 
-        if(true)//Check autorisatie met distributiemedewerker
-        {
-            //create statement/query
-            String query = "SELECT RouteID, Provincie, Status, AantalPakketten, ReisTijd, Afstand, Opmerkingen From route WHERE Status=?";
 
-            //maak er een prepared statment + connectie
-            try (PreparedStatement stmRoutes  = connection.prepareStatement(query)) {
-                stmRoutes.setString(1, status);//parameter toevoegen in query
+        //create statement/query
+        String query = "SELECT RouteID, Provincie, Status, AantalPakketten, ReisTijd, Afstand, Opmerkingen From route WHERE Status=?";
 
-                //data ontvangen---------------------
-                try (ResultSet rs = stmRoutes.executeQuery()) {
-                    while (rs.next()) {
-                        //voeg de route object toe aan arraylist
-                        routes.add(new Route(rs.getInt("RouteID"), rs.getString("Provincie"), rs.getString("Status"), rs.getInt("AantalPakketten"), rs.getDouble("ReisTijd"), rs.getInt("Afstand"), rs.getString("Opmerkingen")));
-                    }
+        //maak er een prepared statment + connectie
+        try (PreparedStatement stmRoutes  = connection.prepareStatement(query)) {
+            stmRoutes.setString(1, status);//parameter toevoegen in query
+
+            //data ontvangen---------------------
+            try (ResultSet rs = stmRoutes.executeQuery()) {
+                while (rs.next()) {
+                    //voeg de route object toe aan arraylist
+                    routes.add(new Route(rs.getInt("RouteID"), rs.getString("Provincie"), rs.getString("Status"), rs.getInt("AantalPakketten"), rs.getDouble("ReisTijd"), rs.getInt("Afstand"), rs.getString("Opmerkingen")));
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
         DatabaseConnectie.verbindingSluiten();
         return routes;
     }
