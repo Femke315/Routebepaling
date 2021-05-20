@@ -66,15 +66,14 @@ public class SQLqueries {
     }
 
     //De geordende lijst van routes ophalen voor het routeoverzicht
-    public ArrayList<String> getRoutesMetArray(){
+    public ArrayList<String> getRoutesMetArray(String status){
         connection=DatabaseConnectie.getConnection();
         ArrayList<String> routes= new ArrayList<>();
-        String status;
 
         if(true)//Check autorisatie met distributiemedewerker
         {
             //create statement/query
-            String query = "SELECT RouteID, Provincie, Status, AantalPakketten, ReisTijd, Afstand From route WHERE Status<>?";
+            String query = "SELECT RouteID, Provincie, Status, AantalPakketten, ReisTijd, Afstand From route WHERE Status=?";
 
             status= "afgerond";
             //maak er een prepared statment + connectie

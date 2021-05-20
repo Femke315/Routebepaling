@@ -7,6 +7,8 @@ public class Order {
     private int routeID;
     private int klantID;
     private String status;
+    private double longitude;
+    private double latitude;
 
     public Order(int orderID){
         DatabaseConnectie.verbindingMaken();
@@ -17,7 +19,6 @@ public class Order {
         String query = "SELECT OrderID, Status, KlantID, RouteID FROM orders WHERE OrderID =?";
 
 
-        //maal er een prepared statment + connectie
         try ( PreparedStatement stmt = DatabaseConnectie.getConnection().prepareStatement(query))
         {
             stmt.setInt(1, orderID);//parameter toevoegen in query
