@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,26 +13,12 @@ public class Order {
     private double latitude;
 
 
-    public Order(String postcode, int orderID, double longitude, double latitude) {
-        this.postcode = postcode;
-        this.orderID = orderID;
-        this.longitude = longitude;
-        this.latitude = latitude;
-    }
-
-    public Order(double longitude, double latitude) {
-        this.longitude = longitude;
-        this.latitude = latitude;
-    }
-
     public Order(int orderID){
         DatabaseConnectie.verbindingMaken();
         this.orderID= orderID;
 
         //create statement/query
-//        String query = "SELECT OrderID, RouteID, Status, KlantID FROM orders o INNER JOIN people p ON o.KlantID=p.PersonID WHERE p.PersonID =?";
         String query = "SELECT OrderID, Status, KlantID, RouteID FROM orders WHERE OrderID =?";
-
 
         try (PreparedStatement stmt = DatabaseConnectie.getConnection().prepareStatement(query))
         {
@@ -51,11 +37,44 @@ public class Order {
             e.printStackTrace();
         }
 
+
+        //----------------------------------------------------------------------------
+        //create statement/query
+        String stmtGetLocatie = "SELECT po.PostCodePK, Latitude, Longitude FROM postcode po INNER JOIN people pe ON po.PostCodePK=pe.postcode WHERE pe.PersonID=?";
+
+        try (PreparedStatement stmt = DatabaseConnectie.getConnection().prepareStatement(stmtGetLocatie))
+        {
+            stmt.setInt(1, klantID);//parameter toevoegen in query
+
+            //ontvangen data
+            try (ResultSet rs = stmt.executeQuery()) {
+                while(rs.next()) {
+                    this.postcode=rs.getString("postcode");
+                    this.longitude=rs.getInt("Longitude");
+                    this.latitude=rs.getInt("Latitude");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         DatabaseConnectie.verbindingSluiten();
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
     }
 
     public int getOrderID() {
         return orderID;
+    }
+
+    public String getStatus() {
+        return status;
     }
 }
 //=======

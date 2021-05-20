@@ -32,9 +32,9 @@ public class SQLqueries {
 
     //voor het algoritme
     //ongeordende lijst met alle routes in een provincie
-    public ArrayList<String> getOrdersVanProvincieMetArray(String provincie){
+    public ArrayList<Order> getOrdersVanProvincieMetArray(String provincie){
         connection=DatabaseConnectie.getConnection();
-        ArrayList<String> ordersLijst= new ArrayList<>();
+        ArrayList<Order> ordersLijst= new ArrayList<>();
 
         boolean isgeautoriseerd = true;
 
@@ -51,7 +51,8 @@ public class SQLqueries {
                 try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
                     while(rs.next()) {
                         //order toevoegen aan de lisjt
-                        ordersLijst.add("OrderID: " + rs.getInt("OrderID"));
+//                        ordersLijst.add("OrderID: " + rs.getInt("OrderID"));
+                        ordersLijst.add(new Order(rs.getInt("OrderID")));
                     }
                 }
             } catch (SQLException e) {
