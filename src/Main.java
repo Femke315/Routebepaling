@@ -1,5 +1,8 @@
 
 import java.io.File;
+import java.sql.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.*;
 
@@ -19,27 +22,12 @@ public class Main {
 
 //        HoofdschermGUI Scherm = new HoofdschermGUI();
 
-        SQLqueries queries= new SQLqueries();//connectie wordt hierin gemaakt
 
-        //methodes testen van SQLqueries file
-//        ArrayList<String> geordendeRoutes =  queries.getRoutesMetArray("Klaar voor sorteren");
-//        for (String route:geordendeRoutes) {
-//            System.out.println(route);
-//        }
-
-
-
-//        ArrayList<String> lijst = queries.getOrdersVanProvincieMetArray("Groningen");
-//        System.out.print("proinvice Groningen:");
-//        for (String order:lijst) {
-//            System.out.println(order);
-//        }
-        System.out.println("\n\n");
-
-//        ArrayList<String> route = queries.showRouteMetArray(1);
-//        for (String bestelling: route) {
-//            System.out.println(bestelling);
-//        }
+        SQLqueries queries= new SQLqueries();
+        ArrayList<Order> orders= new ArrayList<>();
+        orders.add(new Order(1));
+        orders.add(new Order(2));
+        queries.toevoegenRoute(orders);
     }
 
 

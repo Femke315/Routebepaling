@@ -1,5 +1,9 @@
 
 import java.sql.*;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -124,12 +128,25 @@ public class SQLqueries {
     }
 
     //berekende route in database opslaan in een transactie
-    public void toevoegenRoute(ArrayList<Order> route) throws SQLException {
+    public void toevoegenRoute(ArrayList<Order> route) {
         connection= DatabaseConnectie.getConnection();
+
+
+        int routeID=0;
+//
+//        //prepared statement maken
+//        try{
+//            ResultSet rs =  connection.createStatement().executeQuery("SELECT MAX(RouteID) FROM route");
+//            while ( rs.next() ) {
+//                routeID = rs.getInt("RouteID");
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
 
         /*
         *Een route in deze methode aanmaken (dus alle not-null kolommen invullen van de route tabel)
-        *route tabel HELEMAAL opslot zetten
+        *benodidge tabellen HELEMAAL opslot zetten
         *Laatst toegevoegde routeID ophalen.
         *routeID toevoegen aan orders + lastEditedWhen aanpassen + Status veranderen (klaar voor sorteren)
         *routelines toevoegen met behulp van de index van de arraylist, routeID en orderid.
@@ -137,42 +154,78 @@ public class SQLqueries {
         * */
 
 
-        String toevoegenRoute = "INSERT INTO route (AantalPakketten, Afstand, Status) VALUES (?,?,?)";
-        String locktabellen= "LOCK TABLE route, orders, routelines WRITE";//dieper in kijken of deze lock nodig is
-        String ophalenRouteID= "SELECT MAX(RouteID) FROM route";
+        String toevoegenRoute = "INSERT INTO route (AantalPakketten, Afstand, Status, Provincie) VALUES (?,?,?,?)";
+        String lockRouteTabel= "LOCK TABLE route WRITE";//dieper in kijken of deze lock nodig is
+        String lockOrdersTabel= "LOCK TABLE orders WRITE";//dieper in kijken of deze lock nodig is
+        String lockRoutelinesTabel= "LOCK TABLE routelines WRITE";//dieper in kijken of deze lock nodig is
+
+//        String ophalenRouteID= "SELECT MAX(RouteID) FROM route";
         String aanpassenOrder="UPDATE orders SET LastEditedWhen=?, routeID=?, Status= 'Klaar voor sorteren' WHERE OrderID=?";
         String toevoegenRouteline= "INSERT INTO Routelines (VolgordeID, RouteID, OrderID) VALUES (?,?,?)";
         String openTabellen= "UNLOCK TABLES";
 
         try {
             connection.setAutoCommit(false);
-            PreparedStatement firstStatement = connection.prepareStatement(toevoegenRoute);
-            firstStatement.setInt(1, aantalpakketten?);//HIER NOG NAAR KIJKEN
-            firstStatement.setDouble(2, afstand?);
+            PreparedStatement firstStatement = connection.prepareStatement(toevoegenRoute, Statement.RETURN_GENERATED_KEYS);
+            firstStatement.setInt(1, route.size()-2);//-2 begin/eind punt
+            firstStatement.setDouble(2, 200.00);//HIER MOET NOG DE AFSTAND VARIABLE KOMEN
             firstStatement.setString(3, "Klaar voor sorteren");
-            firstStatement.execute();
+            firstStatement.setString(4,"onbekend");
+            firstStatement.executeUpdate();
+            ResultSet rs = firstStatement.getGeneratedKeys();//haal primary key op van de gemaakte route
+            if(rs.next())
+                routeID = rs.getInt(1);
+            System.out.println("eerste query");
+
+            PreparedStatement secondStatement = connection.prepareStatement(lockRouteTabel);
+            secondStatement.executeUpdate();
+            System.out.println("tweede query");
+
+            PreparedStatement lockStatement = connection.prepareStatement(lockOrdersTabel);
+            lockStatement.executeUpdate();
+
+            PreparedStatement locksecondStatement = connection.prepareStatement(lockRoutelinesTabel);
+            locksecondStatement.executeUpdate();
+//
+//            PreparedStatement thirdStatement = connection.prepareStatement(ophalenRouteID);
+//            thirdStatement.execute();//ROUTEID OPHALEN
 
 
-            PreparedStatement secondStatement = connection.prepareStatement(locktabellen);
-            secondStatement.execute();
+            for (int i = 0; i < route.size(); i++) {
+                PreparedStatement fourthStatement = connection.prepareStatement(aanpassenOrder);
+                Date date= (Date) Calendar.getInstance().getTime();
+                fourthStatement.setDate(1, date);//GEtCURRENT DATE
+                fourthStatement.setInt(2, routeID);
+                fourthStatement.setInt(3,route.get(i).getOrderID());
+                fourthStatement.executeUpdate();
+                System.out.println("derde query: " + i);
 
+                PreparedStatement fifthStatement = connection.prepareStatement(toevoegenRouteline);
+                fifthStatement.setInt(1, i);//het begint bij nul, dat is dan de opslag
+                fifthStatement.setInt(2,routeID);
+                fifthStatement.setInt(3,route.get(i).getOrderID());
+                fifthStatement.executeUpdate();
+                System.out.println("vierde query: " + i);
+            }
 
-            PreparedStatement thirdStatement = connection.prepareStatement(ophalenRouteID);
-            thirdStatement.execute();//ROUTEID OPHALEN
+            PreparedStatement sixthStatement = connection.prepareStatement(openTabellen);
+            sixthStatement.executeUpdate();
+            System.out.println("vijfde query");
 
-
-            PreparedStatement fourthStatement = connection.prepareStatement(aanpassenOrder);
-            fourthStatement.executeUpdate();
-
-            PreparedStatement fifthStatement = connection.prepareStatement("secondQuery");
-            fifthStatement.executeUpdate();
             connection.commit();
+            System.out.println("commit");
         } catch(SQLException sqle){
-            connection.rollback();
+            try {
+                connection.rollback();//proberen om alles terug te draaien
+                System.out.println("cause: " + sqle.getMessage());
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
             sqle.getCause();
+        }finally {
+            DatabaseConnectie.verbindingSluiten();
         }
 
-        DatabaseConnectie.verbindingSluiten();
     }
 
 }

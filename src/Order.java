@@ -49,9 +49,9 @@ public class Order {
             //ontvangen data
             try (ResultSet rs = stmt.executeQuery()) {
                 while(rs.next()) {
-                    this.postcode=rs.getString("postcode");
-                    this.longitude=rs.getInt("Longitude");
-                    this.latitude=rs.getInt("Latitude");
+                    this.postcode=rs.getString("PostCodePK");
+                    this.longitude=rs.getDouble("Longitude");
+                    this.latitude=rs.getDouble("Latitude");
                 }
             }
         } catch (SQLException e) {
@@ -59,6 +59,13 @@ public class Order {
         }
 
         DatabaseConnectie.verbindingSluiten();
+    }
+
+    public Order(double latitude, double longitude){
+        DatabaseConnectie.verbindingMaken();
+        this.latitude=latitude;
+        this.longitude=longitude;
+
     }
 
     public double getLongitude() {
@@ -77,26 +84,3 @@ public class Order {
         return status;
     }
 }
-//=======
-//package src;
-//import java.util.ArrayList;
-//
-//public class Order {
-//
-//        public double x;
-//        public double y;
-//
-//        public int orderID;
-//        public int routeID;
-//
-//
-//    }
-//
-//
-//
-//
-//
-//
-//
-//
-//>>>>>>> origin/Distributiemedewerker_&_Route
