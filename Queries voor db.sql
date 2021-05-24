@@ -55,11 +55,6 @@ ALTER TABLE orders
 ADD CONSTRAINT FOREIGN KEY(RouteID) REFERENCES Route(RouteID);
 
 
-/*Weet niet of de check constraint in dezelfde query kan, waarin de kolom waar het om gaat wordt gemaakt*/
-ALTER TABLE orders
-ADD CONSTRAINT CHK_status_Waarde CHECK (Status IN ("Klaar voor bezorging", "Onderweg", "Afgerond", "Anders", "Klaar voor sorteren"));
-
-
 
 /*Not null kolommen people*/
 /*emailadress*/
@@ -95,18 +90,50 @@ MODIFY SearchName varchar(101) NULL;
 ALTER TABLE people
 MODIFY IsExternalLogonProvider tinyint(1) NULL;
 
-/*check constraints*/
-ALTER TABLE route ADD CONSTRAINT check_aangewezenBezorger CHECK (PersonID); 
+
 
 /*Verbinding maken met de klant en de gemaakt bestelling*/
 ALTER TABLE Orders
 ADD FOREIGN KEY (KlantID) REFERENCES people(PersonID);
 						   
 
+
+/*Toevoegen routelines tabel*/
+/*deze staat hier, omdat we dan zeker zijn dat de route tabel is gemaakt*/ 
+CREATE TABLE routelines
+(
+    RouteID int not null,
+    VolgordeID int not null,
+    OrderID int not null,
+    CONSTRAINT PK_route PRIMARY KEY (RouteID, VolgordeID),
+    CONSTRAINT FK_RouteRouteline FOREIGN KEY (RouteID) REFERENCES route(RouteID),
+    CONSTRAINT FK_OrderRouteline FOREIGN KEY (OrderID) REFERENCES orders(OrderID)    
+);
+
+/* Aanpassen kolom namen naar functie van actoren */   
+ALTER TABLE people CHANGE IsSystemUser isStockManager BOOLEAN;
+ALTER TABLE people CHANGE IsEmployee isStockSorter BOOLEAN;
+ALTER TABLE people CHANGE IsSalesperson isDeliverer BOOLEAN;
+
+
+-- use nerdygadgets;
+-- DELIMITER // 
+-- CREATE TRIGGER toebedelenBezorger 
+--     BEFORE UPDATE ON route 
+--     FOR EACH ROW 
+--        BEGIN 
+--          IF new.Status ='Onderweg' AND PersonID is null 
+--          THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Geen bezorger toegewezen aan de route'; 
+--          END IF; 
+--        END; 
+--  // 
+-- DELIMITER ; 
+
+
 /*bezorger, magazijn sorteerder, magazijn manager account maken*/
-CREATE user 'bezorger'@'localhost'  IDENTIFIED BY '<eigen wachtwoord>';
-CREATE user 'sorteerder'@'localhost'  IDENTIFIED BY '<eigen wachtwoord>';
-CREATE user 'magazijn_manager'@'localhost'  IDENTIFIED BY '<eigen wachtwoord>';
+CREATE user 'bezorger'@'localhost' IDENTIFIED BY '<eigen wachtwoord>';
+CREATE user 'sorteerder'@'localhost' IDENTIFIED BY '<eigen wachtwoord>';
+CREATE user 'magazijn_manager'@'localhost' IDENTIFIED BY '<eigen wachtwoord>';
 
 /*grant statements bezorger*/
 GRANT SELECT ON nerdygadgets.people TO 'bezorger'@'localhost'; 
@@ -141,33 +168,12 @@ FLUSH PRIVILEGES;
 /*alles users laten zien*/
 SELECT * FROM mysql.user;
 
-/*Toevoegen routelines tabel*/
-/*deze staat hier, omdat we dan zeker zijn dat de route tabel is gemaakt*/ 
-CREATE TABLE routelines
-(
-    RouteID int not null,
-    VolgordeID int not null,
-    OrderID int not null,
-    CONSTRAINT PK_route PRIMARY KEY (RouteID, VolgordeID),
-    CONSTRAINT FK_RouteRouteline FOREIGN KEY (RouteID) REFERENCES route(RouteID),
-    CONSTRAINT FK_OrderRouteline FOREIGN KEY (OrderID) REFERENCES orders(OrderID)    
-);
-
-/* Aanpassen kolom namen naar functie van actoren */   
-ALTER TABLE people CHANGE IsSystemUser isStockManager BOOLEAN;
-ALTER TABLE people CHANGE IsEmployee isStockSorter BOOLEAN;
-ALTER TABLE people CHANGE IsSalesperson isDeliverer BOOLEAN;
+/*check constraints*/
+ALTER TABLE route ADD CONSTRAINT check_aangewezenBezorger CHECK (PersonID); 
 
 
--- use nerdygadgets;
--- DELIMITER // 
--- CREATE TRIGGER toebedelenBezorger 
---     BEFORE UPDATE ON route 
---     FOR EACH ROW 
---        BEGIN 
---          IF new.Status ='Onderweg' AND PersonID is null 
---          THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Geen bezorger toegewezen aan de route'; 
---          END IF; 
---        END; 
---  // 
--- DELIMITER ; 
+/*Weet niet of de check constraint in dezelfde query kan, waarin de kolom waar het om gaat wordt gemaakt*/
+ALTER TABLE orders
+ADD CONSTRAINT CHK_status_Waarde CHECK (Status IN ("Klaar voor bezorging", "Onderweg", "Afgerond", "Anders", "Klaar voor sorteren"));
+
+
