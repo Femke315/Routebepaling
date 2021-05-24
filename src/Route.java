@@ -1,5 +1,5 @@
 
-
+import java.awt.image.AreaAveragingScaleFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -12,8 +12,9 @@ public class Route {
     private String provincie;
     private String status;
     private String opmerkingen;
-    
-    Order[] Route;
+
+    //Arraylist waar de route in wordt opgeslagen met index als volgnummer
+    ArrayList<Order> Tour;
 
     //we moeten nog bepalen waar een route wordt gemaakt in de database en in object
     public Route(int routeID, String provincie, String status, int aantalPakketten, double reisTijd, int afstand, String opmerkingen) {
@@ -24,6 +25,17 @@ public class Route {
         this.reistijd=reisTijd;
         this.afstand=afstand;
         this.opmerkingen=opmerkingen;
+    }
+
+    //setter om de totale afstand van een route te berekenen
+    public void setTotaleAfstand(double kortsteAfstand) {
+        int afstandErbij = (int) Math.round(kortsteAfstand);
+        this.afstand = getAfstand() + afstandErbij;
+    }
+
+    //
+    public void setAantalPakketten(int aantal) {
+        this.aantalPakketten = aantal;
     }
 
     public int getRouteID() {
@@ -62,7 +74,7 @@ public class Route {
   
 
     //constructor voor een Route. Route wordt aangemaakt doormiddel van nearest neighbour heuristic. De indexnummer is de volgordeID, de value de orderID.
-    public Route(ArrayList<Order> orderlijst) {
+    public void setTour(ArrayList<Order> orderlijst) {
 
         //lijst met steden waaruit nog gekozen kan worden
         //wordt aangemaakt door de meegegeven orderlijst. Deze orderlijsten zijn gesorteerd op provincie
@@ -70,14 +82,14 @@ public class Route {
         citiesLeft = orderlijst;
 
         //Route wordt aangemaakt
-        Order[] route;
+        Tour = new ArrayList<>();
 
-        route = new Order[(orderlijst.size())];
+        //aantal pakketten wordt opgeslagen
+        setAantalPakketten(orderlijst.size());
 
         //startpunt en eindpunt zullen altijd het distributiecentrum zijn, maar is dit inprincipe aan te passen als het nodig is
         Order startpunt = new Order(52.179933, 5.429910);
         Order currentCity = startpunt;
-
 
         int i = 0;
 
@@ -85,15 +97,17 @@ public class Route {
         while (citiesLeft.size() != 0) {
             //System.out.println("Current orderID = : " + currentCity.orderID);
 
-            route[i] = nextOrder(currentCity, citiesLeft);
-            currentCity = route[i];
+            Tour.add(nextOrder(currentCity, citiesLeft));
+            currentCity = Tour.get(i);
             //System.out.println("Next orderID: " + currentCity.orderID);
             citiesLeft.remove(currentCity);
             i++;
+
         }
 
+        //afstand tussen laatste punt en startpunt berekenen
+        setTotaleAfstand(afstandBerekenen(currentCity.getLatitude(), currentCity.getLongitude(), startpunt.getLatitude(), startpunt.getLongitude()));
 
-        this.Route = route;
     }
 
 
@@ -127,6 +141,7 @@ public class Route {
     //en wordt gereturned
     public Order nextOrder(Order currentCity, ArrayList<Order> citiesLeft) {
         double[] afstanden;
+        double kortsteAfstand = 0;
 
         //currentCity is het punt waarvan met alle andere (mogelijke) punten het verschil in verte wordt berekend
         Order volgendeOrder = currentCity;
@@ -137,7 +152,7 @@ public class Route {
         //elke afstand tussen de currentCity en alle andere mogelijke punten worden vergeleken
         for (int i = 0; i < citiesLeft.size(); i++) {
             Order nextCity = citiesLeft.get(i);
-            afstanden[i] = afstandBerekenen(currentCity.x, currentCity.y, nextCity.x, nextCity.y);
+            afstanden[i] = afstandBerekenen(currentCity.getLatitude(), currentCity.getLongitude(), nextCity.getLatitude(), nextCity.getLongitude());
             double minValue = getMin(afstanden);
             //System.out.println(afstanden[i] + " OrderID = " + nextCity.orderID);
 
@@ -145,19 +160,24 @@ public class Route {
             //laagste uiteindelijke afstand wordt doorgegeven als Order object zodat de orderID terug te vinden is.
             if (afstanden[i] <= minValue) {
                 volgendeOrder = citiesLeft.get(i);
+                kortsteAfstand = afstanden[i];
                 //System.out.println("Korste orderID tot nu toe = " + volgendeOrder.orderID);
             }
         }
 
         //System.out.println("kortste orderID = " + volgendeOrder.orderID);
+
+        //afstand van volgendeOrder wordt meegenomen in de totale afstand
+        setTotaleAfstand(kortsteAfstand);
+
         return volgendeOrder;
 
     }
 
 //    simpele methode om een Route snel te weergeven
     public void printRoute() {
-        for (int i = 0; i < Route.length; i++) {
-            System.out.println("Volgordenummer: " + i + ". OrderID = " + Route[i].orderID);
+        for (int i = 0; i < Tour.size(); i++) {
+            System.out.println("Volgordenummer: " + i + ". OrderID = " + Tour.get(i).getOrderID());
         }
     }
 
