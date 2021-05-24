@@ -1,6 +1,7 @@
 
 import java.sql.*;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -158,7 +159,11 @@ public class SQLqueries {
             for (int i = 0; i < route.size(); i++) {
                 //per bestelling status veranderen en routeID meegeven
                 PreparedStatement orderAanpassenStmt = connection.prepareStatement(aanpassenOrder);
-                orderAanpassenStmt.setDate(1, Date.valueOf("2021-05-24"));//GEtCURRENT DATE
+
+                SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd");
+                Date date = new Date(System.currentTimeMillis());//ophalen van huidige datum
+
+                orderAanpassenStmt.setDate(1, Date.valueOf(formatter.format(date)));
                 orderAanpassenStmt.setInt(2, routeID);
                 orderAanpassenStmt.setInt(3,route.get(i).getOrderID());
                 orderAanpassenStmt.executeUpdate();
