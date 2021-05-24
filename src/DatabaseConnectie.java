@@ -1,4 +1,4 @@
-package src;
+//package src;
 import com.mysql.cj.protocol.Resultset;
 
 import javax.xml.crypto.Data;
@@ -207,8 +207,8 @@ public class DatabaseConnectie {
         }
 
        try {
-            statementRegistreren = connection.prepareStatement("INSERT INTO people (PersonID, FullName, PreferredName, SearchName, IsPermittedToLogon, IsExternalLogonProvider, HashedPassword, IsStockmanager, IsStockSorter, IsDeliverer, PhoneNumber, EmailAddress, LastEditedBy, ValidFrom, ValidTo) " +
-                                                                   "VALUES (?, ?, ?, ?, 1, 0, ?, 0, 0, 1, '06 123 45 678', ?, 1, ?, ?)");
+            statementRegistreren = connection.prepareStatement("INSERT INTO people (PersonID, FullName, PreferredName, SearchName, IsPermittedToLogon, IsExternalLogonProvider, HashedPassword, IsStockmanager, IsStockSorter, IsDeliverer, PhoneNumber, EmailAddress, LastEditedBy, ValidFrom, ValidTo,postcode) " +
+                                                                   "VALUES (?, ?, ?, ?, 1, 0, ?, 0, 0, 1, '06 123 45 678', ?, 1, ?, ?, '4568RD')");
             statementRegistreren.setInt(1, personID+1);
             statementRegistreren.setString(2, fullName);
             statementRegistreren.setString(3, fullName);
