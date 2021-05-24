@@ -55,6 +55,7 @@ public class Order {
                 }
             }
         } catch (SQLException e) {
+            System.out.println("Ophalen van order gegevens is fout gegeaan: "+e.toString());
             e.printStackTrace();
         }
 
