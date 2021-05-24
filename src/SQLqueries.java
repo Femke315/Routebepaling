@@ -1,5 +1,7 @@
 
 import java.sql.*;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -124,55 +126,74 @@ public class SQLqueries {
     }
 
     //berekende route in database opslaan in een transactie
-    public void toevoegenRoute(ArrayList<Order> route) throws SQLException {
+    public void toevoegenRoute(ArrayList<Order> route) {
         connection= DatabaseConnectie.getConnection();
+        int routeID=0;
 
-        /*
-        *Een route in deze methode aanmaken (dus alle not-null kolommen invullen van de route tabel)
-        *route tabel HELEMAAL opslot zetten
-        *Laatst toegevoegde routeID ophalen.
-        *routeID toevoegen aan orders + lastEditedWhen aanpassen + Status veranderen (klaar voor sorteren)
-        *routelines toevoegen met behulp van de index van de arraylist, routeID en orderid.
-        *Alle tabellen weer openen.
-        * */
-
-
-        String toevoegenRoute = "INSERT INTO route (AantalPakketten, Afstand, Status) VALUES (?,?,?)";
-        String locktabellen= "LOCK TABLE route, orders, routelines WRITE";//dieper in kijken of deze lock nodig is
-        String ophalenRouteID= "SELECT MAX(RouteID) FROM route";
+        //queries om een route op te slaan
+        String toevoegenRoute = "INSERT INTO route (AantalPakketten, Afstand, Status, Provincie) VALUES (?,?,?,?)";
+        String lockTabellen= "LOCK TABLE route WRITE, orders WRITE, routelines Write";//tabellen opslot zetten
         String aanpassenOrder="UPDATE orders SET LastEditedWhen=?, routeID=?, Status= 'Klaar voor sorteren' WHERE OrderID=?";
         String toevoegenRouteline= "INSERT INTO Routelines (VolgordeID, RouteID, OrderID) VALUES (?,?,?)";
         String openTabellen= "UNLOCK TABLES";
 
         try {
             connection.setAutoCommit(false);
-            PreparedStatement firstStatement = connection.prepareStatement(toevoegenRoute);
-            firstStatement.setInt(1, aantalpakketten?);//HIER NOG NAAR KIJKEN
-            firstStatement.setDouble(2, afstand?);
-            firstStatement.setString(3, "Klaar voor sorteren");
-            firstStatement.execute();
+
+            //Route aanmaken
+            PreparedStatement AanmakenRouteStmt = connection.prepareStatement(toevoegenRoute, Statement.RETURN_GENERATED_KEYS);
+            AanmakenRouteStmt.setInt(1, route.size()-2);//-2 begin/eind punt
+            AanmakenRouteStmt.setDouble(2, 200.00);//HIER MOET NOG DE AFSTAND VARIABLE KOMEN
+            AanmakenRouteStmt.setString(3, "Klaar voor sorteren");
+            AanmakenRouteStmt.setString(4,"onbekend");
+            AanmakenRouteStmt.executeUpdate();
+            ResultSet rs = AanmakenRouteStmt.getGeneratedKeys();//Gemaakte routeID ophalen
+            if(rs.next())
+                routeID = rs.getInt(1);
+
+            //tabellen op slot zetten
+            PreparedStatement tabellenOpslotStmt = connection.prepareStatement(lockTabellen);
+            tabellenOpslotStmt.executeUpdate();
 
 
-            PreparedStatement secondStatement = connection.prepareStatement(locktabellen);
-            secondStatement.execute();
+            for (int i = 0; i < route.size(); i++) {
+                //per bestelling status veranderen en routeID meegeven
+                PreparedStatement orderAanpassenStmt = connection.prepareStatement(aanpassenOrder);
 
+                SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd");
+                Date date = new Date(System.currentTimeMillis());//ophalen van huidige datum
 
-            PreparedStatement thirdStatement = connection.prepareStatement(ophalenRouteID);
-            thirdStatement.execute();//ROUTEID OPHALEN
+                orderAanpassenStmt.setDate(1, Date.valueOf(formatter.format(date)));
+                orderAanpassenStmt.setInt(2, routeID);
+                orderAanpassenStmt.setInt(3,route.get(i).getOrderID());
+                orderAanpassenStmt.executeUpdate();
 
+                //per bestelling een routeline aanmaken
+                PreparedStatement toevoegenRoutelineStmt = connection.prepareStatement(toevoegenRouteline);
+                toevoegenRoutelineStmt.setInt(1, i);//het begint bij nul, dat is dan de opslag
+                toevoegenRoutelineStmt.setInt(2,routeID);
+                toevoegenRoutelineStmt.setInt(3,route.get(i).getOrderID());
+                toevoegenRoutelineStmt.executeUpdate();
+            }
 
-            PreparedStatement fourthStatement = connection.prepareStatement(aanpassenOrder);
-            fourthStatement.executeUpdate();
+            //alle tabellen openen
+            PreparedStatement tabellenOpenenStmt = connection.prepareStatement(openTabellen);
+            tabellenOpenenStmt.executeUpdate();
 
-            PreparedStatement fifthStatement = connection.prepareStatement("secondQuery");
-            fifthStatement.executeUpdate();
             connection.commit();
+            System.out.println("commit");
         } catch(SQLException sqle){
-            connection.rollback();
-            sqle.getCause();
+            System.out.println("cause: " + sqle.getMessage());
+            try {
+                connection.rollback();//proberen om alles terug te draaien
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+                System.out.println("rollback went wrong: " + throwables.getMessage());
+            }
+        }finally {
+            DatabaseConnectie.verbindingSluiten();
         }
 
-        DatabaseConnectie.verbindingSluiten();
     }
 
 }
