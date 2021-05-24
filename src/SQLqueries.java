@@ -34,39 +34,39 @@ public class SQLqueries {
 
     //voor het algoritme
     //ongeordende lijst met alle routes in een provincie
-//    public ArrayList<Order> getOrdersVanProvincie(String provincie){
-//        connection=DatabaseConnectie.getConnection();
-//        ArrayList<Order> ordersLijst= new ArrayList<Order>();
-//
-//        boolean isgeautoriseerd = true;
-//
-//
-//        if(isgeautoriseerd)//Check autorisatie?
-//        {
-//            //create statement/query
-//            String query = "SELECT OrderID FROM orders o INNER JOIN people p ON o.KlantID=p.PersonID WHERE p.postcode IN (" +
-//                    "SELECT PostCodePK FROM postcode WHERE provincie = ? ) limit 100";
-//
-//            try (PreparedStatement stmt = connection.prepareStatement(query))
-//            {
-//                stmt.setString(1, provincie);//parameter toevoegen in query
-//                try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
-//                    while(rs.next()) {
-//                        //order toevoegen aan de lisjt
-////                        ordersLijst.add("OrderID: " + rs.getInt("OrderID"));
-//                        ordersLijst.add(new Order(rs.getInt("OrderID")));
-//                    }
-//                }
-//            } catch (SQLException e) {
-//                e.printStackTrace();
-//            }
-//
-//        }
-//
-//
-//        DatabaseConnectie.verbindingSluiten();
-//        return ordersLijst;
-//    }
+    public ArrayList<Order> getOrdersVanProvincie(String provincie){
+        connection=DatabaseConnectie.getConnection();
+        ArrayList<Order> ordersLijst= new ArrayList<Order>();
+
+        boolean isgeautoriseerd = true;
+
+
+        if(isgeautoriseerd)//Check autorisatie?
+        {
+            //create statement/query
+            String query = "SELECT OrderID FROM orders o INNER JOIN people p ON o.KlantID=p.PersonID WHERE p.postcode IN (" +
+                    "SELECT PostCodePK FROM postcode WHERE provincie = ? ) limit 100";
+
+            try (PreparedStatement stmt = connection.prepareStatement(query))
+            {
+                stmt.setString(1, provincie);//parameter toevoegen in query
+                try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
+                    while(rs.next()) {
+                        //order toevoegen aan de lisjt
+//                        ordersLijst.add("OrderID: " + rs.getInt("OrderID"));
+                        ordersLijst.add(new Order(rs.getInt("OrderID")));
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+
+        DatabaseConnectie.verbindingSluiten();
+        return ordersLijst;
+    }
 
     //De al geordende lijst van routes ophalen voor het routeoverzicht
     public static ArrayList<Route> getRoutes(String status){
@@ -96,12 +96,10 @@ public class SQLqueries {
         return routes;
     }
 
-    //functie om één route te laten zien
-//    routeID mee
-//    arraylist met orders terug
-    public ArrayList<String> showRoute(int routeID){
+    //één route ophalen
+    public ArrayList<Order> showRoute(int routeID){
         connection=DatabaseConnectie.getConnection();
-        ArrayList<String> route= new ArrayList<String>();
+        ArrayList<Order> route= new ArrayList<Order>();
 
         String query = "SELECT o.OrderID, volgordeID FROM orders o INNER JOIN routelines r ON o.OrderID=r.OrderID WHERE r.RouteID=?";
 
@@ -115,7 +113,7 @@ public class SQLqueries {
                 while(rs.next()) {
                     System.out.println("Opgehaald OrderID: " + rs.getInt("OrderID"));
                     //order toevoegen op een specifieke index
-                    route.add(rs.getInt("volgordeID"), "OrderID: " + rs.getInt("OrderID"));
+                    route.add(rs.getInt("volgordeID"), new Order(rs.getInt("OrderID")));
                 }
             }
         } catch (SQLException e) {
