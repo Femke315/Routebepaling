@@ -1,4 +1,4 @@
-package src;
+//package src;
 
 public class Distributiemedewerker {
     private static String naam;

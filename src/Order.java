@@ -63,10 +63,8 @@ public class Order {
     }
 
     public Order(double latitude, double longitude){
-        DatabaseConnectie.verbindingMaken();
         this.latitude=latitude;
         this.longitude=longitude;
-
     }
 
     public double getLongitude() {

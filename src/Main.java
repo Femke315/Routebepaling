@@ -1,10 +1,6 @@
 
 import java.io.File;
-import java.sql.Date;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.*;
 
 public class Main {
 
@@ -16,18 +12,16 @@ public class Main {
 //        System.out.println(inloggen);
 //        System.out.println();
 //
-////        Boolean registreren = DatabaseConnectie.registreren("Job van Ardenne", "TestWachtwoord", "job@hotmail.nl");
+//        Boolean registreren = DatabaseConnectie.registreren("Anna", "TestWachtwoord", "Nerdy@hotmail.nl");
 //
 //        Boolean verbindingSluiten = DatabaseConnectie.verbindingSluiten();
 
-//        HoofdschermGUI Scherm = new HoofdschermGUI();
+        HoofdschermGUI Scherm = new HoofdschermGUI();
 
-
-        SQLqueries queries= new SQLqueries();
-        ArrayList<Order> orders= new ArrayList<>();
-        orders.add(new Order(1));
-        orders.add(new Order(2));
-        queries.toevoegenRoute(orders);
+//        SQLqueries queries= new SQLqueries();//connectie wordt hierin gemaakt
+//        queries.getProducts(37);//test getProduct()
+//        queries.getRoutes("Klaar voor sorteren");
+//        queries.getpeople(3146);//Connectie wordt hierin gesloten
     }
 
 

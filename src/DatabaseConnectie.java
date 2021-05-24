@@ -1,4 +1,4 @@
-
+//package src;
 import com.mysql.cj.protocol.Resultset;
 
 import javax.xml.crypto.Data;
@@ -36,10 +36,6 @@ public class DatabaseConnectie {
         return isVerbonden;
     }
 
-    public static Connection getConnection() {
-        verbindingMaken();
-        return connection;
-    }
 
     public static String inloggen(String gebruikersnaam, String wachtwoord){
         PreparedStatement statementGebruikersnaam = null;
@@ -104,7 +100,12 @@ public class DatabaseConnectie {
             // Permissie checken
             if (rs != null && gebruikersnaamKlopt && wachtwoordKlopt) {
                 try {
-                    permissieKlopt = rs.getBoolean(5);
+                    permissieKlopt = rs.getBoolean(9);
+                    if (!permissieKlopt) {
+                        permissieKlopt = rs.getBoolean(10);
+                    } if (!permissieKlopt) {
+                        permissieKlopt = rs.getBoolean(11);
+                    }
                 } catch (SQLException throwables) {
                     System.out.println("inloggen() = Permissie gegevens konden niet opgehaalt worden:");
                     inlogStatus = "Permissie gegevens konden niet opgehaalt worden";
@@ -117,6 +118,35 @@ public class DatabaseConnectie {
                 } else {
                     inlogStatus = "Account is ingelogd";
                 }
+            }
+
+            // Distributiemedewerker klasse invullen
+            if (permissieKlopt) {
+                try {
+                    String naam = rs.getString(2);
+                    String mail = rs.getString(15);
+                    String telefoonnummer = rs.getString(13);
+                    int personID = rs.getInt(1);
+                    String functie;
+
+                    if (rs.getBoolean(9)){
+                        functie = "Magazijn manager";
+                    } else if (rs.getBoolean(10)) {
+                        functie = "Magazijn sorteerder";
+                    } else if (rs.getBoolean(11)) {
+                        functie = "Bezorger";
+                    } else {
+                        functie = "Medewerker";
+                    }
+
+                    Distributiemedewerker.Inloggen(naam, mail, telefoonnummer, personID, functie);
+
+                } catch (SQLException throwables) {
+                    System.out.println("inloggen() = Permissie gegevens konden niet opgehaalt worden:");
+                    System.out.println(throwables.toString());
+                    System.out.println();
+                }
+
             }
 
 
@@ -177,8 +207,8 @@ public class DatabaseConnectie {
         }
 
        try {
-            statementRegistreren = connection.prepareStatement("INSERT INTO people (PersonID, FullName, PreferredName, SearchName, IsPermittedToLogon, IsExternalLogonProvider, HashedPassword, IsSystemUser, IsEmployee, IsSalesperson, PhoneNumber, EmailAddress, LastEditedBy, ValidFrom, ValidTo) " +
-                                                                   "VALUES (?, ?, ?, ?, 1, 0, ?, 1, 1, 0, '06 123 45 678', ?, 1, ?, ?)");
+            statementRegistreren = connection.prepareStatement("INSERT INTO people (PersonID, FullName, PreferredName, SearchName, IsPermittedToLogon, IsExternalLogonProvider, HashedPassword, IsStockmanager, IsStockSorter, IsDeliverer, PhoneNumber, EmailAddress, LastEditedBy, ValidFrom, ValidTo,postcode) " +
+                                                                   "VALUES (?, ?, ?, ?, 1, 0, ?, 0, 0, 1, '06 123 45 678', ?, 1, ?, ?, '4568RD')");
             statementRegistreren.setInt(1, personID+1);
             statementRegistreren.setString(2, fullName);
             statementRegistreren.setString(3, fullName);
@@ -215,7 +245,8 @@ public class DatabaseConnectie {
                 foutmelding = throwables;
             }
             if (isGesloten) {
-                System.out.println("\nverbindingSluiten() = De verbinding met de database is verbroken!\n");
+                System.out.println("verbindingSluiten() = De verbinding met de database is verbroken!");
+                System.out.println();
             } else {
                 System.out.println("verbindingSluiten() = De verbinding met de database kon niet worden verbroken:");
                 System.out.println(foutmelding.toString());
@@ -227,6 +258,11 @@ public class DatabaseConnectie {
             System.out.println();
             return false;
         }
+    }
+
+    public static Connection getConnection() {
+        verbindingMaken();
+        return connection;
     }
 
 
