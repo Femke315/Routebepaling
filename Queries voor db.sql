@@ -1,7 +1,7 @@
 
 /*Toevoegen postcode kolom in people*/
 ALTER TABLE people
-ADD postcode varchar(20) Not null, ADD address varchar(60) Not null, ADD plaats varchar(60) Not null;
+ADD postcode varchar(20) Not null, ADD adres varchar(60) Not null, ADD plaats varchar(60) Not null;
 
 use nerdygadgets;
 /*Toevoegen route kolom in orders*/
