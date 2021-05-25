@@ -3,7 +3,7 @@
 ALTER TABLE people
 ADD postcode varchar(20) Not null;
 
-
+use nerdygadgets;
 /*Toevoegen route kolom in orders*/
 ALTER TABLE orders
 ADD column RouteID int null, ADD Status varchar(50) null, add klantID int(11) not null ;
@@ -116,18 +116,18 @@ ALTER TABLE people CHANGE IsEmployee isStockSorter BOOLEAN;
 ALTER TABLE people CHANGE IsSalesperson isDeliverer BOOLEAN;
 
 
--- use nerdygadgets;
--- DELIMITER // 
--- CREATE TRIGGER toebedelenBezorger 
---     BEFORE UPDATE ON route 
---     FOR EACH ROW 
---        BEGIN 
---          IF new.Status ='Onderweg' AND PersonID is null 
---          THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Geen bezorger toegewezen aan de route'; 
---          END IF; 
---        END; 
---  // 
--- DELIMITER ; 
+/*De status van een route kan niet op 'onderweg', als er geen bezorger is toegewezen*/
+DELIMITER // 
+CREATE TRIGGER toebedelenBezorger 
+    BEFORE UPDATE ON route 
+    FOR EACH ROW 
+       BEGIN 
+         IF new.Status ='Onderweg' AND old.PersonID is null 
+         THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Geen bezorger toegewezen aan de route'; 
+         END IF; 
+       END; 
+ // 
+DELIMITER ; 
 
 
 /*bezorger, magazijn sorteerder, magazijn manager account maken*/
