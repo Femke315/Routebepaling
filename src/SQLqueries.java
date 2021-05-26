@@ -69,7 +69,7 @@ public class SQLqueries {
         return ordersLijst;
     }
 
-    //De al geordende lijst van routes ophalen voor het routeoverzicht
+    //NA het algoritme: De al geordende lijst van routes ophalen voor het routeoverzicht
     public static ArrayList<Route> getRoutes(String status){
         connection=DatabaseConnectie.getConnection();
         ArrayList<Route> routes= new ArrayList<>();
@@ -97,12 +97,10 @@ public class SQLqueries {
         return routes;
     }
 
-    //functie om één route te laten zien
-//    routeID mee
-//    arraylist met orders terug
-    public ArrayList<String> showRoute(int routeID){
+    //NA het algoritme: één route ophalen
+    public ArrayList<Order> showRoute(int routeID){
         connection=DatabaseConnectie.getConnection();
-        ArrayList<String> route= new ArrayList<String>();
+        ArrayList<Order> route= new ArrayList<>();
 
         String query = "SELECT o.OrderID, volgordeID FROM orders o INNER JOIN routelines r ON o.OrderID=r.OrderID WHERE r.RouteID=?";
 
@@ -114,9 +112,10 @@ public class SQLqueries {
             //opgevraagde data ontvangen
             try (ResultSet rs = stmt.executeQuery()) {
                 while(rs.next()) {
-                    System.out.println("Opgehaald OrderID: " + rs.getInt("OrderID"));
+//                    System.out.println("Opgehaald OrderID: " + rs.getInt("OrderID"));
                     //order toevoegen op een specifieke index
-                    route.add(rs.getInt("volgordeID"), "OrderID: " + rs.getInt("OrderID"));
+
+                    route.add(rs.getInt("volgordeID")-1, new Order(rs.getInt("OrderID")));
                 }
             }
         } catch (SQLException e) {
@@ -201,4 +200,144 @@ public class SQLqueries {
 
     }
 
+    //Voor de actor: de magazijn manager
+    public boolean statusSorterenNaarBezorging(int routeID){
+
+        boolean isAangepast=false;
+
+        connection=DatabaseConnectie.getConnection();
+
+        String query = "UPDATE route SET Status='Klaar voor bezorging' WHERE RouteID=?";
+
+        //prepared statement maken
+        try (PreparedStatement stmt = connection.prepareStatement(query))
+        {
+            stmt.setInt(1, routeID);//parameter toevoegen in query
+            int aantalRijenVeranderd =stmt.executeUpdate();
+
+            if(aantalRijenVeranderd ==1){
+                isAangepast=true;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        DatabaseConnectie.verbindingSluiten();
+
+        return isAangepast;
+    }
+
+    //Voor de actor: de bezorger
+    public boolean statusBezorgingNaarOnderweg(int routeID, int personID){
+        boolean zijnAangepast=false;
+        int aantalRijenAangepast=0;
+        connection=DatabaseConnectie.getConnection();
+
+        //eerst toe-eigenen van een route
+        String toeEigenenQuery = "UPDATE route SET PersonID=? WHERE RouteID=?";
+
+        //prepared statement maken
+        try (PreparedStatement stmt = connection.prepareStatement(toeEigenenQuery))
+        {
+            stmt.setInt(1, personID);//medewerkersnummer toevoegen
+            stmt.setInt(2, routeID);//routeID toevoegen
+
+            aantalRijenAangepast = stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        //query om een route status te veranderen
+        String updateQuery = "UPDATE route SET Status='Onderweg' WHERE RouteID=?";
+
+        //prepared statement maken
+        try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery))
+        {
+            updateStmt.setInt(1, routeID);//parameter toevoegen in query
+             aantalRijenAangepast =+ updateStmt.executeUpdate();
+            //checken of beide statements zijn uitgevoerd
+            if(aantalRijenAangepast ==2){
+                zijnAangepast=true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+
+        DatabaseConnectie.verbindingSluiten();
+
+        return zijnAangepast;
+    }
+
+    //Voor de actor: de bezorger
+    public boolean routeAfronden(Route route){
+        boolean isAangepast=false;
+
+        connection= DatabaseConnectie.getConnection();
+
+        //orderlijst ophalen van route
+        ArrayList<Order> bestellingen = showRoute(route.getRouteID());
+
+        /*
+            Status van route op 'afronden' zetten
+            Statussen van alle bestellingen op 'afronden' zetten
+         */
+
+        //queries om een route op te slaan
+        String updateRouteStatus= "UPDATE route SET Status='Afgerond' WHERE RouteID=?";
+        String lockTabellen= "LOCK TABLE orders WRITE";//tabellen opslot zetten
+        String aanpassenOrder="UPDATE orders SET LastEditedWhen=?, Status='Geleverd' WHERE OrderID=?";
+        String openTabel= "UNLOCK TABLES";
+
+        try {
+            connection.setAutoCommit(false);
+
+            //Route aanmaken
+            PreparedStatement AanmakenRouteStmt = connection.prepareStatement(updateRouteStatus);
+            AanmakenRouteStmt.setInt(1, route.getRouteID());
+            AanmakenRouteStmt.executeUpdate();
+
+            //orders tabel op slot zetten
+            PreparedStatement tabellenOpslotStmt = connection.prepareStatement(lockTabellen);
+            tabellenOpslotStmt.executeUpdate();
+
+
+            //per bestelling de Status en LastEditedWhen kolommen aanpassen
+            for (Order bestelling: bestellingen) {
+                PreparedStatement orderAanpassenStmt = connection.prepareStatement(aanpassenOrder);
+
+                SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd");
+                Date date = new Date(System.currentTimeMillis());//ophalen van huidige datum
+
+                orderAanpassenStmt.setDate(1, Date.valueOf(formatter.format(date)));
+                orderAanpassenStmt.setInt(2, bestelling.getOrderID());//get orderID
+                orderAanpassenStmt.executeUpdate();
+            }
+
+
+            //alle tabellen openen
+            PreparedStatement tabellenOpenenStmt = connection.prepareStatement(openTabel);
+            tabellenOpenenStmt.executeUpdate();
+
+            connection.commit();
+            System.out.println("commit");
+            isAangepast=true;
+        } catch(SQLException sqle){
+            System.out.println("cause: " + sqle.getMessage());
+            try {
+                connection.rollback();//proberen om alles terug te draaien
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+                System.out.println("rollback ging verkeerd: " + throwables.getMessage());
+            }
+        }finally {
+            DatabaseConnectie.verbindingSluiten();
+        }
+
+
+        return isAangepast;
+    }
 }
