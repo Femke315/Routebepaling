@@ -41,7 +41,7 @@ public class Order {
 
         //---------------------------------------------------------------------------------------
         //create statement/query
-        String stmtGetLocatie = "SELECT pe.postcode, pe.plaats, pe.adres, Latitude, Longitude FROM postcode po INNER JOIN people pe ON po.PostCodePK=pe.postcode WHERE pe.PersonID=?";
+        String stmtGetLocatie = "SELECT pe.postcode, pe.plaats, pe.adres, Latitude, Longitude FROM postcode po INNER JOIN people pe ON po.PostCode=pe.postcode WHERE pe.PersonID=?";
 
         try (PreparedStatement stmt = DatabaseConnectie.getConnection().prepareStatement(stmtGetLocatie))
         {
