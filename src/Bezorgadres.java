@@ -1,3 +1,5 @@
+package src;
+
 public class Bezorgadres {
     private String naam;
     private double latitude;

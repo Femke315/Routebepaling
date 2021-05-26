@@ -11,9 +11,12 @@ public class Order {
     public String postcode;
     private double longitude;
     private double latitude;
+    private String plaats;
+    private String adres;
 
 
     public Order(int orderID){
+        DatabaseConnectie.verbindingMaken();
         this.orderID= orderID;
 
         //create statement/query
@@ -26,7 +29,7 @@ public class Order {
             //ontvangen data
             try (ResultSet rs = stmt.executeQuery()) {
                 while(rs.next()) {
-                    System.out.println("OrderID: " + rs.getInt("OrderID"));
+//                    System.out.println("OrderID: " + rs.getInt("OrderID"));
                     this.klantID=rs.getInt("KlantID");
                     this.status=rs.getString("Status");
                     this.routeID=rs.getInt("RouteID");
@@ -39,7 +42,7 @@ public class Order {
 
         //---------------------------------------------------------------------------------------
         //create statement/query
-        String stmtGetLocatie = "SELECT po.PostCode, Latitude, Longitude FROM postcode po INNER JOIN people pe ON po.PostCode=pe.postcode WHERE pe.PersonID=?";
+        String stmtGetLocatie = "SELECT pe.postcode, pe.plaats, pe.adres, Latitude, Longitude FROM postcode po INNER JOIN people pe ON po.PostCode=pe.postcode WHERE pe.PersonID=?";
 
         try (PreparedStatement stmt = DatabaseConnectie.getConnection().prepareStatement(stmtGetLocatie))
         {
@@ -48,9 +51,11 @@ public class Order {
             //ontvangen data
             try (ResultSet rs = stmt.executeQuery()) {
                 while(rs.next()) {
-                    this.postcode=rs.getString("PostCode");
+                    this.postcode=rs.getString("PostCodePK");
                     this.longitude=rs.getDouble("Longitude");
                     this.latitude=rs.getDouble("Latitude");
+                    this.plaats=rs.getString("plaats");
+                    this.adres=rs.getString("adres");
                 }
             }
         } catch (SQLException e) {
@@ -81,5 +86,21 @@ public class Order {
 
     public String getStatus() {
         return status;
+    }
+
+    public String getPostcode() {
+        return postcode;
+    }
+
+    public String getPlaats() {
+        return plaats;
+    }
+
+    public String getAdres() {
+        return adres;
+    }
+
+    public int getKlantID() {
+        return klantID;
     }
 }
