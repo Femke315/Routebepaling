@@ -191,4 +191,32 @@ public class SQLqueries {
 
     }
 
+    //Voor de actor: bezorger
+    public Route gekozenRouteOphalen(int personID){
+        connection=DatabaseConnectie.getConnection();
+        Route gekozenRoute=null;
+
+        //checken of bezorger nog bezig is met een route
+        String query = "SELECT RouteID, Provincie, AantalPakketten, Reistijd, Afstand, Opmerkingen FROM route WHERE Status='Onderweg' AND PersonID=? LIMIT 1";
+
+        //prepared statement maken
+        try (PreparedStatement stmt = connection.prepareStatement(query))
+        {
+            stmt.setInt(1, personID);//parameter toevoegen in query
+
+            //opgevraagde data ontvangen
+            try (ResultSet rs = stmt.executeQuery()) {
+                while(rs.next()) {
+                    //opgehaalde gegevens invoeren in een route object
+                    gekozenRoute= new Route(rs.getInt("RouteID"), rs.getString("Provincie"), "Onderweg", rs.getInt("AantalPakketten"), rs.getDouble("Reistijd"), rs.getInt("Afstand"), rs.getString("Opmerkingen"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        DatabaseConnectie.verbindingSluiten();
+
+        return gekozenRoute;
+    }
 }
