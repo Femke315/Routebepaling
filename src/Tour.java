@@ -1,11 +1,10 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Tour {
 
     int afstand;
     int aantalPakketten;
-    ArrayList<Order> Tour;
+    ArrayList<Order> Route;
 
     //setter om de totale afstand van een route te berekenen
     public void setTotaleAfstand(double kortsteAfstand) {
@@ -26,7 +25,7 @@ public class Tour {
     }
 
     //constructor voor een Route. Route wordt aangemaakt doormiddel van nearest neighbour heuristic. De indexnummer is de volgordeID, de value de orderID.
-    public void setTour(ArrayList<Order> orderlijst) {
+    public Tour(ArrayList<Order> orderlijst) {
 
         //lijst met steden waaruit nog gekozen kan worden
         //wordt aangemaakt door de meegegeven orderlijst. Deze orderlijsten zijn gesorteerd op provincie
@@ -34,7 +33,7 @@ public class Tour {
         citiesLeft = orderlijst;
 
         //Route wordt aangemaakt
-        Tour = new ArrayList<>();
+        Route = new ArrayList<>();
 
         //aantal pakketten wordt opgeslagen
         setAantalPakketten(orderlijst.size());
@@ -49,8 +48,8 @@ public class Tour {
         while (citiesLeft.size() != 0) {
             //System.out.println("Current orderID = : " + currentCity.orderID);
 
-            Tour.add(nextOrder(currentCity, citiesLeft));
-            currentCity = Tour.get(i);
+            Route.add(nextOrder(currentCity, citiesLeft));
+            currentCity = Route.get(i);
             //System.out.println("Next orderID: " + currentCity.orderID);
             citiesLeft.remove(currentCity);
             i++;
@@ -58,11 +57,10 @@ public class Tour {
         }
 
         //afstand tussen laatste punt en startpunt berekenen
+        System.out.println("afstand tussen laatste stad en startpunt = " + afstandBerekenen(currentCity.getLatitude(), currentCity.getLongitude(), startpunt.getLatitude(), startpunt.getLongitude()));
+
         setTotaleAfstand(afstandBerekenen(currentCity.getLatitude(), currentCity.getLongitude(), startpunt.getLatitude(), startpunt.getLongitude()));
-
     }
-
-
 
     //Methode om afstand te berekenen tussen de x en y coordinaten van twee punten
     public double afstandBerekenen(double userLat, double userLng, double venueLat, double venueLng) {
@@ -113,7 +111,7 @@ public class Tour {
             if (afstanden[i] <= minValue) {
                 volgendeOrder = citiesLeft.get(i);
                 kortsteAfstand = afstanden[i];
-                //System.out.println("Korste orderID tot nu toe = " + volgendeOrder.orderID);
+                //System.out.println("Korste afstand tot nu toe = " + kortsteAfstand);
             }
         }
 
@@ -121,6 +119,7 @@ public class Tour {
 
         //afstand van volgendeOrder wordt meegenomen in de totale afstand
         setTotaleAfstand(kortsteAfstand);
+        //System.out.println("kortste afstand = " + kortsteAfstand);
 
         return volgendeOrder;
 
@@ -128,8 +127,8 @@ public class Tour {
 
     //    simpele methode om een Route snel te weergeven
     public void printRoute() {
-        for (int i = 0; i < Tour.size(); i++) {
-            System.out.println("Volgordenummer: " + i + ". OrderID = " + Tour.get(i).getOrderID());
+        for (int i = 0; i < Route.size(); i++) {
+            System.out.println("Volgordenummer: " + i + ". OrderID = " + Route.get(i).getOrderID());
         }
     }
 

@@ -3,7 +3,10 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 public class HoofdschermGUI extends JFrame implements ActionListener {
 
@@ -29,8 +32,7 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
     private JButton accountMenu;
 
     // Attributen voor route-aanmaakpagina
-    private JSpinner aanmaakAantalBezorguren;
-    private JSpinner aanmaakAantalRoutes;
+    private JComboBox provincieList;
     private JButton aanmaakBevestig;
     private JButton aanmaakMenu;
 
@@ -327,14 +329,29 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
     }
 
     public void aanmakenRouteAanmaakPagina(){
+        String[] provincieString = new String[12];
+        provincieString[0] = "Groningen";
+        provincieString[1] = "Friesland";
+        provincieString[2] = "Drenthe";
+        provincieString[3] = "Overijssel";
+        provincieString[4] = "Flevoland";
+        provincieString[5] = "Gelderland";
+        provincieString[6] = "Utrecht";
+        provincieString[7] = "Noord-Holland";
+        provincieString[8] = "Zuid-Holland";
+        provincieString[9] = "Zeeland";
+        provincieString[10] = "Noord-Brabant";
+        provincieString[11] = "Limburg";
+
         // Aanmaken content
         titelTekst.setText("NerdyGadgets - Nieuwe routes aanmaken");
         JLabel aanmaakTekst = new JLabel("Nieuwe routes aanmaken");
-        JLabel aanmaakAantalBezorgurenTekst = new JLabel("Aantal bezorguren per route:");
-        JLabel aanmaakAantalRoutesTekst = new JLabel("Aantal te maken routes:");
-        aanmaakAantalBezorguren = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
-        aanmaakAantalRoutes = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
-        aanmaakBevestig = new JButton("Nieuwe routes aanmaken");
+        JLabel provincieTekst = new JLabel("Provincie:");
+        provincieList = new JComboBox(provincieString);
+        provincieList.setSelectedIndex(11);
+
+        aanmaakBevestig = new JButton("Nieuwe route aanmaken");
+        aanmaakBevestig.addActionListener(this);
         aanmaakMenu = new JButton("Menu");
         aanmaakMenu.addActionListener(this);
 
@@ -344,12 +361,10 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         aanmaakMenu.setBorder(BorderFactory.createEmptyBorder());
 
         aanmaakTekst.setForeground(mainColor);
-        aanmaakAantalBezorgurenTekst.setForeground(mainColor);
-        aanmaakAantalRoutesTekst.setForeground(mainColor);
-        aanmaakAantalBezorguren.setBackground(mainColor);
-        aanmaakAantalBezorguren.setForeground(textColor);
-        aanmaakAantalRoutes.setBackground(mainColor);
-        aanmaakAantalRoutes.setForeground(textColor);
+        provincieList.setForeground(textColor);
+        provincieList.setBackground(mainColor);
+        provincieTekst.setForeground(mainColor);
+        provincieTekst.setBackground(textColor);
         aanmaakBevestig.setBackground(mainColor);
         aanmaakBevestig.setForeground(textColor);
         aanmaakMenu.setBackground(mainColor);
@@ -357,21 +372,18 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
 
         // Positionering van content
         aanmaakTekst.setBounds(45, 100, 350, 35);
-        aanmaakAantalBezorgurenTekst.setBounds(80, 165, 200, 35);
-        aanmaakAantalBezorguren.setBounds(280, 165, 40, 35);
-        aanmaakAantalRoutesTekst.setBounds(80, 215, 200, 35);
-        aanmaakAantalRoutes.setBounds(280, 215, 40, 35);
+        provincieTekst.setBounds(100, 175, 200, 35);
+        provincieList.setBounds(175, 175, 125, 35);
         aanmaakBevestig.setBounds(100, 270, 200, 35);
         aanmaakMenu.setBounds(100, 320, 200, 35);
 
         // Toevoegen van content
         add(aanmaakTekst);
-        add(aanmaakAantalBezorgurenTekst);
-        add(aanmaakAantalBezorguren);
-        add(aanmaakAantalRoutesTekst);
-        add(aanmaakAantalRoutes);
+        add(provincieTekst);
+        add(provincieList);
         add(aanmaakBevestig);
         add(aanmaakMenu);
+
     }
 
     public void aanmakenRouteoverzichtPagina(){
@@ -627,7 +639,26 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         } else if (e.getSource() == menuRouteAanmaken) {
             afrondenPagina();
             aanmakenRouteAanmaakPagina();
-        } else if (e.getSource() == menuUitloggen) {
+        } else if (e.getSource() == aanmaakBevestig){
+            Route route = new Route(provincieList.getSelectedItem().toString());
+
+            if (route.getAantalPakketten() == 0) {
+                JFrame f = new JFrame();
+
+                JOptionPane.showMessageDialog(f,
+                        "ERROR: alle orders in de provincie " + provincieList.getSelectedItem().toString() + " zijn verwerkt!");
+            } else {
+
+                SQLqueries.toevoegenRoute(route);
+
+                JFrame f = new JFrame();
+                JOptionPane.showMessageDialog(f,
+                        "Route in provincie " + provincieList.getSelectedItem().toString() +  " is toegevoegd!"
+                        + "\n" + "Aantal pakketjes: " + route.getAantalPakketten()
+                        + "\n" + "Totale afstand (in km) = " + route.getAfstand());
+            }
+
+        }   else if (e.getSource() == menuUitloggen) {
             Distributiemedewerker.Uitloggen();
             overzichtHuidigePagina = 1;
             afrondenPagina();

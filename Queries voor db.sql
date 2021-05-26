@@ -1,3 +1,4 @@
+use nerdygadgets;
 
 /*Toevoegen postcode kolom in people*/
 ALTER TABLE people
@@ -93,8 +94,8 @@ MODIFY IsExternalLogonProvider tinyint(1) NULL;
 
 
 /*Verbinding maken met de klant en de gemaakt bestelling*/
-ALTER TABLE Orders
-ADD FOREIGN KEY (KlantID) REFERENCES people(PersonID);
+ALTER TABLE orders
+ADD FOREIGN KEY (klantID) REFERENCES people(PersonID);
 						   
 
 

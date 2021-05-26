@@ -14,7 +14,6 @@ public class Order {
 
 
     public Order(int orderID){
-        DatabaseConnectie.verbindingMaken();
         this.orderID= orderID;
 
         //create statement/query
@@ -40,7 +39,7 @@ public class Order {
 
         //---------------------------------------------------------------------------------------
         //create statement/query
-        String stmtGetLocatie = "SELECT po.PostCodePK, Latitude, Longitude FROM postcode po INNER JOIN people pe ON po.PostCodePK=pe.postcode WHERE pe.PersonID=?";
+        String stmtGetLocatie = "SELECT po.PostCode, Latitude, Longitude FROM postcode po INNER JOIN people pe ON po.PostCode=pe.postcode WHERE pe.PersonID=?";
 
         try (PreparedStatement stmt = DatabaseConnectie.getConnection().prepareStatement(stmtGetLocatie))
         {
@@ -49,7 +48,7 @@ public class Order {
             //ontvangen data
             try (ResultSet rs = stmt.executeQuery()) {
                 while(rs.next()) {
-                    this.postcode=rs.getString("PostCodePK");
+                    this.postcode=rs.getString("PostCode");
                     this.longitude=rs.getDouble("Longitude");
                     this.latitude=rs.getDouble("Latitude");
                 }
@@ -60,6 +59,7 @@ public class Order {
         }
 
         DatabaseConnectie.verbindingSluiten();
+
     }
 
     public Order(double latitude, double longitude){

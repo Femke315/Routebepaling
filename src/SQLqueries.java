@@ -34,39 +34,40 @@ public class SQLqueries {
 
     //voor het algoritme
     //ongeordende lijst met alle routes in een provincie
-//    public ArrayList<Order> getOrdersVanProvincie(String provincie){
-//        connection=DatabaseConnectie.getConnection();
-//        ArrayList<Order> ordersLijst= new ArrayList<Order>();
-//
-//        boolean isgeautoriseerd = true;
-//
-//
-//        if(isgeautoriseerd)//Check autorisatie?
-//        {
-//            //create statement/query
-//            String query = "SELECT OrderID FROM orders o INNER JOIN people p ON o.KlantID=p.PersonID WHERE p.postcode IN (" +
-//                    "SELECT PostCodePK FROM postcode WHERE provincie = ? ) limit 100";
-//
-//            try (PreparedStatement stmt = connection.prepareStatement(query))
-//            {
-//                stmt.setString(1, provincie);//parameter toevoegen in query
-//                try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
-//                    while(rs.next()) {
-//                        //order toevoegen aan de lisjt
-////                        ordersLijst.add("OrderID: " + rs.getInt("OrderID"));
-//                        ordersLijst.add(new Order(rs.getInt("OrderID")));
-//                    }
-//                }
-//            } catch (SQLException e) {
-//                e.printStackTrace();
-//            }
-//
-//        }
-//
-//
-//        DatabaseConnectie.verbindingSluiten();
-//        return ordersLijst;
-//    }
+    public static ArrayList<Order> getOrdersVanProvincie(String provincie){
+        connection=DatabaseConnectie.getConnection();
+        ArrayList<Order> ordersLijst= new ArrayList<>();
+
+        boolean isgeautoriseerd = true;
+
+
+        if(isgeautoriseerd)//Check autorisatie?
+        {
+            //create statement/query
+            String query = "SELECT OrderID FROM orders o INNER JOIN people p ON o.KlantID=p.PersonID WHERE p.postcode IN (" +
+                    "SELECT PostCode FROM postcode WHERE Provincie = ? ) AND o.Status = ? limit 100";
+
+            try (PreparedStatement stmt = connection.prepareStatement(query))
+            {
+                stmt.setString(1, provincie);//parameter toevoegen in query
+                stmt.setString(2, "Klaar voor route");
+                try (ResultSet rs = stmt.executeQuery()) {//ontvangen data
+                    while(rs.next()) {
+                        //order toevoegen aan de lisjt
+//                        ordersLijst.add("OrderID: " + rs.getInt("OrderID"));
+                        ordersLijst.add(new Order(rs.getInt("OrderID")));
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+
+        DatabaseConnectie.verbindingSluiten();
+        return ordersLijst;
+    }
 
     //De al geordende lijst van routes ophalen voor het routeoverzicht
     public static ArrayList<Route> getRoutes(String status){
@@ -130,7 +131,7 @@ public class SQLqueries {
 
 
     //berekende route in database opslaan in een transactie
-    public void toevoegenRoute(Tour route) {
+    public static void toevoegenRoute(Route route) {
         connection= DatabaseConnectie.getConnection();
         int routeID=0;
 
@@ -149,7 +150,7 @@ public class SQLqueries {
             AanmakenRouteStmt.setInt(1, route.getAantalPakketten());
             AanmakenRouteStmt.setInt(2, route.getAfstand());//HIER MOET NOG DE AFSTAND VARIABLE KOMEN
             AanmakenRouteStmt.setString(3, "Klaar voor sorteren");
-            AanmakenRouteStmt.setString(4,"onbekend");
+            AanmakenRouteStmt.setString(4, route.getProvincie());
             AanmakenRouteStmt.executeUpdate();
             ResultSet rs = AanmakenRouteStmt.getGeneratedKeys();//Gemaakte routeID ophalen
             if(rs.next())
@@ -169,14 +170,14 @@ public class SQLqueries {
 
                 orderAanpassenStmt.setDate(1, Date.valueOf(formatter.format(date)));
                 orderAanpassenStmt.setInt(2, routeID);
-                orderAanpassenStmt.setInt(3,route.Tour.get(i).getOrderID());
+                orderAanpassenStmt.setInt(3,route.getOrderIDfromTour(i));
                 orderAanpassenStmt.executeUpdate();
 
                 //per bestelling een routeline aanmaken
                 PreparedStatement toevoegenRoutelineStmt = connection.prepareStatement(toevoegenRouteline);
                 toevoegenRoutelineStmt.setInt(1, i);//het begint bij nul, dat is dan de opslag
                 toevoegenRoutelineStmt.setInt(2,routeID);
-                toevoegenRoutelineStmt.setInt(3,route.Tour.get(i).getOrderID());
+                toevoegenRoutelineStmt.setInt(3,route.getOrderIDfromTour(i));
                 toevoegenRoutelineStmt.executeUpdate();
             }
 
