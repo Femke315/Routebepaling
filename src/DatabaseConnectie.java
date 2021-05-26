@@ -1,4 +1,4 @@
-//package src;
+package src;
 import com.mysql.cj.protocol.Resultset;
 
 import javax.xml.crypto.Data;
@@ -141,6 +141,10 @@ public class DatabaseConnectie {
 
                     Distributiemedewerker.Inloggen(naam, mail, telefoonnummer, personID, functie);
 
+                    if (Distributiemedewerker.getFunctie().equals("Bezorger")) {
+                        Distributiemedewerker.setRoute(SQLqueries.gekozenRouteOphalen(Distributiemedewerker.getPersonID()));
+                    }
+
                 } catch (SQLException throwables) {
                     System.out.println("inloggen() = Permissie gegevens konden niet opgehaalt worden:");
                     System.out.println(throwables.toString());
@@ -261,7 +265,12 @@ public class DatabaseConnectie {
     }
 
     public static Connection getConnection() {
-        verbindingMaken();
+        try {
+        if (connection==null || connection.isClosed()) {
+            verbindingMaken();
+        } } catch (SQLException ignored) {
+
+        }
         return connection;
     }
 
