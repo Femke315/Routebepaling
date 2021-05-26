@@ -16,12 +16,16 @@ public class Main {
 //
 //        Boolean verbindingSluiten = DatabaseConnectie.verbindingSluiten();
 
-        HoofdschermGUI Scherm = new HoofdschermGUI();
+//        HoofdschermGUI Scherm = new HoofdschermGUI();
 
-//        SQLqueries queries= new SQLqueries();//connectie wordt hierin gemaakt
-//        queries.getProducts(37);//test getProduct()
-//        queries.getRoutes("Klaar voor sorteren");
-//        queries.getpeople(3146);//Connectie wordt hierin gesloten
+        SQLqueries queries= new SQLqueries();//connectie wordt hierin gemaakt
+        ArrayList<Order> orders= queries.showRoute(1);
+        for (Order o:orders) {
+            System.out.println("Postcode: " + o.getPostcode());
+            System.out.println("Plaats: " + o.getPlaats());
+            System.out.println("adres: "+ o.getAdres());
+            System.out.println("\n");
+        }
     }
 
 

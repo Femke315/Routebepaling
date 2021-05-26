@@ -34,4 +34,20 @@ public class Distributiemedewerker {
     public static String getFunctie() {
         return functie;
     }
+
+    public static String getNaam() {
+        return naam;
+    }
+
+    public static String getMail() {
+        return mail;
+    }
+
+    public static String getTelefoonnummer() {
+        return telefoonnummer;
+    }
+
+    public static int getPersonID() {
+        return personID;
+    }
 }

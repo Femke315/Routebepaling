@@ -32,8 +32,7 @@ public class SQLqueries {
 
     }
 
-    //voor het algoritme
-    //ongeordende lijst met alle routes in een provincie
+    //VÓÓR het algoritme: ongeordende lijst met alle orders in een provincie
     public ArrayList<Order> getOrdersVanProvincie(String provincie){
         connection=DatabaseConnectie.getConnection();
         ArrayList<Order> ordersLijst= new ArrayList<>();
@@ -63,7 +62,7 @@ public class SQLqueries {
         return ordersLijst;
     }
 
-    //De al geordende lijst van routes ophalen voor het routeoverzicht
+    //NA het algoritme: De al geordende lijst van routes ophalen voor het routeoverzicht
     public static ArrayList<Route> getRoutes(String status){
         connection=DatabaseConnectie.getConnection();
         ArrayList<Route> routes= new ArrayList<>();
@@ -91,7 +90,7 @@ public class SQLqueries {
         return routes;
     }
 
-    //één route ophalen
+    //NA het algoritme: één route ophalen
     public ArrayList<Order> showRoute(int routeID){
         connection=DatabaseConnectie.getConnection();
         ArrayList<Order> route= new ArrayList<>();
@@ -106,9 +105,10 @@ public class SQLqueries {
             //opgevraagde data ontvangen
             try (ResultSet rs = stmt.executeQuery()) {
                 while(rs.next()) {
-                    System.out.println("Opgehaald OrderID: " + rs.getInt("OrderID"));
+//                    System.out.println("Opgehaald OrderID: " + rs.getInt("OrderID"));
                     //order toevoegen op een specifieke index
-                    route.add(rs.getInt("volgordeID"), new Order(rs.getInt("OrderID")));
+
+                    route.add(rs.getInt("volgordeID")-1, new Order(rs.getInt("OrderID")));
                 }
             }
         } catch (SQLException e) {
@@ -120,9 +120,7 @@ public class SQLqueries {
         return route;
     }
 
-
-
-    //berekende route in database opslaan in een transactie
+    //Een berekende route in database opslaan in een transactie
     public void toevoegenRoute(Tour route) {
         connection= DatabaseConnectie.getConnection();
         int routeID=0;
