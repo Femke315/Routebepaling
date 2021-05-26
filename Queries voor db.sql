@@ -1,5 +1,5 @@
 
-/*Toevoegen postcode kolom in people*/
+/*Toevoegen postcode, adres en plaats kolommen in people*/
 ALTER TABLE people
 ADD postcode varchar(20) Not null, ADD adres varchar(60) Not null, ADD plaats varchar(60) Not null;
 
@@ -99,7 +99,6 @@ ADD FOREIGN KEY (KlantID) REFERENCES people(PersonID);
 
 
 /*Toevoegen routelines tabel*/
-/*deze staat hier, omdat we dan zeker zijn dat de route tabel is gemaakt*/ 
 CREATE TABLE routelines
 (
     RouteID int not null,
