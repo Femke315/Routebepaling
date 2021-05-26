@@ -173,6 +173,6 @@ ALTER TABLE route ADD CONSTRAINT check_aangewezenBezorger CHECK (PersonID);
 
 /*Weet niet of de check constraint in dezelfde query kan, waarin de kolom waar het om gaat wordt gemaakt*/
 ALTER TABLE orders
-ADD CONSTRAINT CHK_status_Waarde CHECK (Status IN ("Klaar voor bezorging", "Onderweg", "Afgerond", "Anders", "Klaar voor sorteren", "Klaar voor routebepaling"));
+ADD CONSTRAINT CHK_status_Waarde CHECK (Status IN ("Klaar voor bezorging", "Onderweg", "Geleverd", "Anders", "Klaar voor sorteren", "Klaar voor routebepaling"));
 
 
