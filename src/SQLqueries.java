@@ -190,7 +190,7 @@ public class SQLqueries {
 
     }
 
-    //Voor de actor: de magazijn manager
+    //Voor de actor: de magazijn sorteerder
     public boolean statusSorterenNaarBezorging(int routeID){
 
         boolean isAangepast=false;
@@ -330,4 +330,7 @@ public class SQLqueries {
 
         return isAangepast;
     }
+
+
+
 }
