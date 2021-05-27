@@ -39,8 +39,9 @@ public class SQLqueries {
 
         //create statement/query
         String query = "SELECT OrderID FROM orders o INNER JOIN people p ON o.KlantID=p.PersonID WHERE p.postcode IN (" +
-                "SELECT PostCode FROM postcode WHERE provincie = ? ) limit 100";
-
+                "SELECT PostCode FROM postcode WHERE provincie = ?)" +
+                "AND o.Status = 'Klaar voor route' "+
+                "limit 100";
         try (PreparedStatement stmt = connection.prepareStatement(query))
         {
             stmt.setString(1, provincie);//parameter toevoegen in query
