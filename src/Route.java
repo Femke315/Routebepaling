@@ -14,7 +14,8 @@ public class Route {
     private String opmerkingen;
     private Tour Tour;
 
-    //we moeten nog bepalen waar een route wordt gemaakt in de database en in object
+    //Constructor voor de Route die wordt aangeroepen wanneer er een nieuwe Route wordt aangemaakt
+    //WORDT ALLEEN GEBRUIKT VOOR ROUTEBEPALING
     public Route(String provincie) {
       this.provincie = provincie;
 
@@ -31,6 +32,8 @@ public class Route {
       }
     }
 
+    //Route contructor voor het ophalen van een Route uit de database. Ophalen van de daadwerkelijke route wordt dan
+    //via een andere methode gehaald en komt uit de tabel routelines
     public Route(int routeID, String provincie, String status, int aantalPakketten, double reisTijd, int afstand, String opmerkingen) {
         this.routeID=routeID;
         this.provincie=provincie;

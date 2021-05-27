@@ -51,7 +51,7 @@ public class Order {
             //ontvangen data
             try (ResultSet rs = stmt.executeQuery()) {
                 while(rs.next()) {
-                    this.postcode=rs.getString("PostCodePK");
+                    this.postcode=rs.getString("PostCode");
                     this.longitude=rs.getDouble("Longitude");
                     this.latitude=rs.getDouble("Latitude");
                     this.plaats=rs.getString("plaats");

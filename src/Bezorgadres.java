@@ -1,4 +1,4 @@
-package src;
+//package src;
 
 public class Bezorgadres {
     private String naam;
