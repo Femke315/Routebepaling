@@ -364,8 +364,8 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
     }
 
     public void aanmakenRouteAanmaakPagina(){
-        String[] provincieString = new String[12];
-        provincieString[0] = "Groningen";
+        String[] provincieString = new String[13];
+        provincieString[0] = "";
         provincieString[1] = "Friesland";
         provincieString[2] = "Drenthe";
         provincieString[3] = "Overijssel";
@@ -377,13 +377,14 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         provincieString[9] = "Zeeland";
         provincieString[10] = "Noord-Brabant";
         provincieString[11] = "Limburg";
+        provincieString[12] = "Groningen";
 
         // Aanmaken content
         titelTekst.setText("NerdyGadgets - Nieuwe routes aanmaken");
         JLabel aanmaakTekst = new JLabel("Nieuwe routes aanmaken");
         JLabel provincieTekst = new JLabel("Provincie:");
         provincieList = new JComboBox(provincieString);
-        provincieList.setSelectedIndex(11);
+        provincieList.setSelectedIndex(0);
 
         aanmaakBevestig = new JButton("Nieuwe route aanmaken");
         aanmaakBevestig.addActionListener(this);
@@ -653,8 +654,10 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
                     orderTitels.add("OrderID " + orderlijst.get(i).getOrderID() + ": " + orderlijst.get(i).getPlaats());
                     orderGegevens.add(orderlijst.get(i).getAdres() + " " + orderlijst.get(i).getPostcode());
                 } else {
+                    Orderline orderline = new Orderline(orderlijst.get(i).getOrderID());
                     orderTitels.add("OrderID " + orderlijst.get(i).getOrderID());
-                    orderGegevens.add(orderlijst.get(i).getAdres() + " " + orderlijst.get(i).getPostcode());
+                    orderGegevens.add(orderline.printOrderline(orderline));
+                    //orderGegevens.add(orderlijst.get(i).getAdres() + " " + orderlijst.get(i).getPostcode());
                 }
             } else {
                 orderTitels.add("");
