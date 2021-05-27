@@ -98,7 +98,7 @@ public class SQLqueries {
         connection=DatabaseConnectie.getConnection();
         ArrayList<Order> route= new ArrayList<>();
 
-        String query = "SELECT o.OrderID, volgordeID FROM orders o INNER JOIN routelines r ON o.OrderID=r.OrderID WHERE r.RouteID=?";
+        String query = "SELECT o.OrderID, VolgordeID FROM orders o INNER JOIN routelines r ON o.OrderID=r.OrderID WHERE r.RouteID=?";
 
         //prepared statement maken
         try (PreparedStatement stmt = connection.prepareStatement(query))
@@ -108,10 +108,8 @@ public class SQLqueries {
             //opgevraagde data ontvangen
             try (ResultSet rs = stmt.executeQuery()) {
                 while(rs.next()) {
-//                    System.out.println("Opgehaald OrderID: " + rs.getInt("OrderID"));
                     //order toevoegen op een specifieke index
-
-                    route.add(rs.getInt("volgordeID"), new Order(rs.getInt("OrderID")));
+                    route.add(rs.getInt("VolgordeID"), new Order(rs.getInt("OrderID")));
                 }
             }
         } catch (SQLException e) {
