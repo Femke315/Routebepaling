@@ -7,6 +7,7 @@ import java.util.*;
 
 public class SQLqueries {
     private static Connection connection;
+
     //product informatie ophalen
     public static void getProducts(int productID){
         connection=DatabaseConnectie.getConnection();
@@ -33,6 +34,7 @@ public class SQLqueries {
     }
 
     //VÓÓR het algoritme: ongeordende lijst met alle orders in een provincie
+    //Deze haalt alle bestellingen op van één provincie
     public static ArrayList<Order> getOrdersVanProvincie(String provincie){
         connection=DatabaseConnectie.getConnection();
         ArrayList<Order> ordersLijst= new ArrayList<>();
@@ -62,6 +64,7 @@ public class SQLqueries {
     }
 
     //NA het algoritme: De al geordende lijst van routes ophalen voor het routeoverzicht
+    //Deze methode haalt alle routes op die een bepaalde status hebben
     public static ArrayList<Route> getRoutes(String status){
         connection=DatabaseConnectie.getConnection();
         ArrayList<Route> routes= new ArrayList<>();
@@ -90,6 +93,7 @@ public class SQLqueries {
     }
 
     //NA het algoritme: één route ophalen
+    //Deze methode haalt alle bestellingen op van één route
     public static ArrayList<Order> showRoute(int routeID){
         connection=DatabaseConnectie.getConnection();
         ArrayList<Order> route= new ArrayList<>();
@@ -119,7 +123,7 @@ public class SQLqueries {
         return route;
     }
 
-    //Een berekende route in database opslaan in een transactie
+    //Deze methode voegt een berekende route in database toe met transactie
     public static void toevoegenRoute(Route route) {
         connection = DatabaseConnectie.getConnection();
         int routeID = 0;
@@ -191,6 +195,7 @@ public class SQLqueries {
     }
 
     //Voor de actor: bezorger
+    //Deze methode haalt een gekozen route op van een bezorger waar hij/zij nog met bezig is.
     public static Route gekozenRouteOphalen(int personID){
         connection=DatabaseConnectie.getConnection();
         Route gekozenRoute=null;
@@ -220,7 +225,8 @@ public class SQLqueries {
     }
 
     //Voor de actor: de magazijn sorteerder
-    public static boolean statusSorterenNaarBezorging(int routeID){
+    //Deze methode verandert de status van een route naar "klaar voor bezorging"
+    public static boolean statusNaarBezorging(int routeID){
 
         boolean isAangepast=false;
 
@@ -248,7 +254,8 @@ public class SQLqueries {
     }
 
     //Voor de actor: de bezorger
-    public static boolean statusBezorgingNaarOnderweg(int routeID, int personID){
+    //Deze methode verandert de status van een route naar "onderweg"
+    public static boolean statusNaarOnderweg(int routeID, int personID){
         boolean zijnAangepast=false;
         int aantalRijenAangepast=0;
         connection=DatabaseConnectie.getConnection();
@@ -293,6 +300,7 @@ public class SQLqueries {
     }
 
     //Voor de actor: de bezorger
+    //Deze methode gaat een route afronden met behulp van een transactie
     public static boolean routeAfronden(Route route){
         boolean isAangepast=false;
         //orderlijst ophalen van route
