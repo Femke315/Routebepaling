@@ -14,9 +14,7 @@ public class Order {
     private String plaats;
     private String adres;
 
-
     public Order(int orderID){
-        DatabaseConnectie.verbindingMaken();
         this.orderID= orderID;
 
         //create statement/query
@@ -62,8 +60,6 @@ public class Order {
             System.out.println("Ophalen van order gegevens is fout gegeaan: "+e.toString());
             e.printStackTrace();
         }
-
-        DatabaseConnectie.verbindingSluiten();
 
     }
 
