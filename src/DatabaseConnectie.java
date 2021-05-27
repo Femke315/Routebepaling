@@ -1,6 +1,4 @@
-import com.mysql.cj.protocol.Resultset;
 
-import javax.xml.crypto.Data;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -18,12 +16,14 @@ public class DatabaseConnectie {
         boolean isVerbonden = true;
         SQLException foutmelding = null;
 
-        try {
+        try {//proberen connectie te leggen
             connection = DriverManager.getConnection(url,username,password);
         } catch (SQLException throwables) {
             isVerbonden = false;
             foutmelding = throwables;
         }
+
+        //check connectie
         if (isVerbonden) {
             System.out.println("verbindingMaken() = Er is verbinding gemaakt met de database!");
             System.out.println();
@@ -70,6 +70,7 @@ public class DatabaseConnectie {
                 byte[] hash = null;
 
                 try {
+                    //ingevoerde wachtwoord hashen
                     digest = MessageDigest.getInstance("SHA-256");
                     hash = digest.digest(wachtwoord.getBytes(StandardCharsets.UTF_8));
                 } catch (NoSuchAlgorithmException throwables) {
@@ -79,9 +80,9 @@ public class DatabaseConnectie {
                     System.out.println();
                 }
 
-                try {
-                    wachtwoordKlopt = (Arrays.equals(rs.getBytes(8), hash));
 
+                try {//gehashte wachtwoord vergelijken met wachtwoord in de database
+                    wachtwoordKlopt = (Arrays.equals(rs.getBytes(8), hash));
                     System.out.println();
                 } catch (SQLException throwables) {
                     System.out.println("inloggen() = Wachtwoorden konden niet worden vergeleken:");
@@ -174,6 +175,8 @@ public class DatabaseConnectie {
     }
 
 
+
+    //deze methode werd gebruikt om actor dummy data toe te voegen in de database
     public static boolean registreren(String fullName, String password, String emailaddress) {
 
         DatabaseConnectie.verbindingMaken();
@@ -265,10 +268,12 @@ public class DatabaseConnectie {
 
     public static Connection getConnection() {
         try {
-        if (connection==null || connection.isClosed()) {
-            verbindingMaken();
-        } } catch (SQLException ignored) {
-
+            //Maak connectie wanneer er geen connectie is
+            if (connection==null || connection.isClosed()) {
+                verbindingMaken();
+            }
+        } catch (SQLException ignored) {
+            System.out.println("connectie maken of connectie doorgegeven is verkeerd gegaan: " +ignored.getMessage());
         }
         return connection;
     }

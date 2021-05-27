@@ -295,15 +295,9 @@ public class SQLqueries {
     //Voor de actor: de bezorger
     public static boolean routeAfronden(Route route){
         boolean isAangepast=false;
+        //orderlijst ophalen van route
         ArrayList<Order> bestellingen = showRoute(route.getRouteID());
         connection= DatabaseConnectie.getConnection();
-
-        //orderlijst ophalen van route
-
-        /*
-            Status van route op 'afronden' zetten
-            Statussen van alle bestellingen op 'afronden' zetten
-         */
 
         //queries om een route op te slaan
         String updateRouteStatus= "UPDATE route SET Status='Afgerond' WHERE RouteID=?";
