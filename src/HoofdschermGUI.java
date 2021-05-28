@@ -930,16 +930,19 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         } else if (e.getSource() == bezorgrouteoverzichtKlaarzetten) {
             System.out.println(SQLqueries.statusNaarBezorging(bezorgrouteoverzichtRouteID));
             afrondenPagina();
+            bezorgrouteoverzichtHuidigePagina = 1;
             aanmakenMenuPagina();
         } else if (e.getSource() == bezorgrouteoverzichtToeeigenen) {
             System.out.println(SQLqueries.statusNaarOnderweg(bezorgrouteoverzichtRouteID, Distributiemedewerker.getPersonID()));
             Distributiemedewerker.setRoute(SQLqueries.gekozenRouteOphalen(Distributiemedewerker.getPersonID()));
             afrondenPagina();
+            bezorgrouteoverzichtHuidigePagina = 1;
             aanmakenMenuPagina();
         } else if (e.getSource() == bezorgrouteoverzichtAfrondeRoute) {
             System.out.println(SQLqueries.routeAfronden(Distributiemedewerker.getRoute()));
             Distributiemedewerker.setRoute(SQLqueries.gekozenRouteOphalen(Distributiemedewerker.getPersonID()));
             afrondenPagina();
+            bezorgrouteoverzichtHuidigePagina = 1;
             aanmakenMenuPagina();
         }
     }

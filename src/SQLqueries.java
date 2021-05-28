@@ -108,7 +108,9 @@ public class SQLqueries {
             //opgevraagde data ontvangen
             try (ResultSet rs = stmt.executeQuery()) {
                 while(rs.next()) {
+//                    System.out.println("Opgehaald OrderID: " + rs.getInt("OrderID"));
                     //order toevoegen op een specifieke index
+
                     route.add(rs.getInt("VolgordeID"), new Order(rs.getInt("OrderID")));
                 }
             }
