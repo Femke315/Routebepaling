@@ -8,6 +8,9 @@ import java.util.ArrayList;
 
 public class Orderline {
     private int orderlineID;
+    private int orderID;
+    private int stockitemID;
+    private int quantity;
 
     public int getOrderID() {
         return orderID;
@@ -21,17 +24,11 @@ public class Orderline {
         return quantity;
     }
 
-    private int orderID;
-    private int stockitemID;
-    private int quantity;
-    ArrayList<Orderline> orderlines;
-
     public Orderline(int orderID) {
         DatabaseConnectie.verbindingMaken();
         Connection connection = DatabaseConnectie.getConnection();
 
         this.orderID = orderID;
-        this.orderlines = new ArrayList<>();
 
         //create query
         String query = "SELECT OrderLineID, StockItemID, Quantity FROM orderlines WHERE OrderID=?";
