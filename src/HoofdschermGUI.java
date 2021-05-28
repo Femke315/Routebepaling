@@ -3,8 +3,6 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
@@ -33,7 +31,7 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
     private JButton accountMenu;
 
     // Attributen voor route-aanmaakpagina
-    private JComboBox provincieList;
+    private JComboBox provincieLijst;
     private JButton aanmaakBevestig;
     private JButton aanmaakMenu;
 
@@ -166,7 +164,7 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         loginBevestig.setForeground(textColor);
 
 
-        // Doorzichtbare tekst in mailadres tekstveld
+        // Doorzichtbare tekst/placeholder in mailadres tekstveld
         loginMail.setForeground(Color.GRAY);
         loginMail.setText("Mailadres");
         loginMail.addFocusListener(new FocusListener() {
@@ -186,7 +184,7 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         });
 
 
-        // Doorzichtbare tekst in wachtwoord tekstveld
+        // Doorzichtbare tekst/placeholder in wachtwoord tekstveld
         Checkbox passCheckBox = new Checkbox();
         passCheckBox.setState(true);
 
@@ -383,8 +381,8 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         titelTekst.setText("NerdyGadgets - Nieuwe routes aanmaken");
         JLabel aanmaakTekst = new JLabel("Nieuwe routes aanmaken");
         JLabel provincieTekst = new JLabel("Provincie:");
-        provincieList = new JComboBox(provincieString);
-        provincieList.setSelectedIndex(0);
+        provincieLijst = new JComboBox(provincieString);
+        provincieLijst.setSelectedIndex(0);
 
         aanmaakBevestig = new JButton("Nieuwe route aanmaken");
         aanmaakBevestig.addActionListener(this);
@@ -397,8 +395,8 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         aanmaakMenu.setBorder(BorderFactory.createEmptyBorder());
 
         aanmaakTekst.setForeground(mainColor);
-        provincieList.setForeground(textColor);
-        provincieList.setBackground(mainColor);
+        provincieLijst.setForeground(textColor);
+        provincieLijst.setBackground(mainColor);
         provincieTekst.setForeground(mainColor);
         provincieTekst.setBackground(textColor);
         aanmaakBevestig.setBackground(mainColor);
@@ -409,14 +407,14 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         // Positionering van content
         aanmaakTekst.setBounds(45, 100, 350, 35);
         provincieTekst.setBounds(100, 175, 200, 35);
-        provincieList.setBounds(175, 175, 125, 35);
+        provincieLijst.setBounds(175, 175, 125, 35);
         aanmaakBevestig.setBounds(100, 270, 200, 35);
         aanmaakMenu.setBounds(100, 320, 200, 35);
 
         // Toevoegen van content
         add(aanmaakTekst);
         add(provincieTekst);
-        add(provincieList);
+        add(provincieLijst);
         add(aanmaakBevestig);
         add(aanmaakMenu);
 
@@ -436,7 +434,7 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
             routelijst.addAll(SQLqueries.getRoutes("Onderweg"));
         }
 
-        // Aantal paginas berekenen
+        // Aantal pagina's berekenen
         int aantalPaginas = (int) Math.ceil(routelijst.size()/4.00);
         if (aantalPaginas<1){
             aantalPaginas = 1;
@@ -854,20 +852,20 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
             afrondenPagina();
             aanmakenRouteAanmaakPagina();
         } else if (e.getSource() == aanmaakBevestig){
-            Route route = new Route(provincieList.getSelectedItem().toString());
+            Route route = new Route(provincieLijst.getSelectedItem().toString());
 
             if (route.getAantalPakketten() == 0) {
                 JFrame f = new JFrame();
 
                 JOptionPane.showMessageDialog(f,
-                        "ERROR: alle orders in de provincie " + provincieList.getSelectedItem().toString() + " zijn verwerkt!");
+                        "ERROR: alle orders in de provincie " + provincieLijst.getSelectedItem().toString() + " zijn verwerkt!");
             } else {
 
                 SQLqueries.toevoegenRoute(route);
 
                 JFrame f = new JFrame();
                 JOptionPane.showMessageDialog(f,
-                        "Route in provincie " + provincieList.getSelectedItem().toString() +  " is toegevoegd!"
+                        "Route in provincie " + provincieLijst.getSelectedItem().toString() +  " is toegevoegd!"
                         + "\n" + "Aantal pakketjes: " + route.getAantalPakketten()
                         + "\n" + "Totale afstand (in km) = " + route.getAfstand());
             }
@@ -930,12 +928,12 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         } else if (e.getSource() == bezorgrouteoverzichtVerwijderroute) {
             // verwijder methode
         } else if (e.getSource() == bezorgrouteoverzichtKlaarzetten) {
-            System.out.println(SQLqueries.statusSorterenNaarBezorging(bezorgrouteoverzichtRouteID));
+            System.out.println(SQLqueries.statusNaarBezorging(bezorgrouteoverzichtRouteID));
             afrondenPagina();
             bezorgrouteoverzichtHuidigePagina = 1;
             aanmakenMenuPagina();
         } else if (e.getSource() == bezorgrouteoverzichtToeeigenen) {
-            System.out.println(SQLqueries.statusBezorgingNaarOnderweg(bezorgrouteoverzichtRouteID, Distributiemedewerker.getPersonID()));
+            System.out.println(SQLqueries.statusNaarOnderweg(bezorgrouteoverzichtRouteID, Distributiemedewerker.getPersonID()));
             Distributiemedewerker.setRoute(SQLqueries.gekozenRouteOphalen(Distributiemedewerker.getPersonID()));
             afrondenPagina();
             bezorgrouteoverzichtHuidigePagina = 1;
