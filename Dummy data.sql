@@ -41,3 +41,121 @@ INSERT INTO route (RouteID,PersonID,AantalPakketten,Reistijd,Afstand,Provincie,S
 INSERT INTO route (RouteID,PersonID,AantalPakketten,Reistijd,Afstand,Provincie,Status,Opmerkingen) VALUES (21,null,73,7,280,"Groningen","Klaar voor bezorging",null),(22,null,68,7,300,"Friesland","Klaar voor bezorging",null),(23,null,46,5.5,280,"Drenthe","Klaar voor bezorging",null),(24,null,98,7,160,"Utrecht","Klaar voor bezorging",null),(25,null,84,6,160,"Gelderland","Klaar voor bezorging",null),(26,null,43,5.5,300,"Noord-Holland","Klaar voor bezorging",null),(27,null,83,7.5,320,"Limburg","Klaar voor bezorging",null),(28,null,54,7.5,400,"Groningen","Klaar voor bezorging",null),(29,null,62,8,400,"Groningen","Klaar voor bezorging",null),(30,null,94,6.5,120,"Noord-Brabant","Klaar voor bezorging",null);
 INSERT INTO route (RouteID,PersonID,AantalPakketten,Reistijd,Afstand,Provincie,Status,Opmerkingen) VALUES (31,null,73,7,280,"Groningen","Klaar voor sorteren",null),(32,null,68,7,300,"Friesland","Klaar voor sorteren",null),(33,null,46,5.5,280,"Drenthe","Klaar voor sorteren",null),(34,null,98,7,160,"Utrecht","Klaar voor sorteren",null),(35,null,84,6,160,"Gelderland","Klaar voor sorteren",null),(36,null,43,5.5,300,"Noord-Holland","Klaar voor sorteren",null),(37,null,83,7.5,320,"Limburg","Klaar voor sorteren",null),(38,null,54,7.5,400,"Groningen","Klaar voor sorteren",null),(39,null,62,8,400,"Groningen","Klaar voor sorteren",null),(40,null,94,6.5,120,"Noord-Brabant","Klaar voor sorteren",null);
 
+/*dummy data poeple
+UPDATE people SET
+postcode = "6651EH",
+adres = "Genechtstraat 24"
+WHERE PersonID = 3300;
+
+UPDATE people SET
+postcode = "7231JH",
+adres = "Breegraven 79"
+WHERE PersonID = 2299;
+
+UPDATE people SET
+postcode = "6828AA",
+adres = "Apeldoornsestraat 2"
+WHERE PersonID = 2298;
+
+UPDATE people SET
+postcode = "4191SE",
+adres = "Rijksstraatweg 3"
+WHERE PersonID = 2297;
+
+UPDATE people SET
+postcode = "7326KV",
+adres = "Branewinkel 610"
+WHERE PersonID = 2296;
+
+UPDATE people SET
+postcode = "6685AT",
+adres = "Mariaplein 4"
+WHERE PersonID = 2295;
+
+UPDATE people SET
+postcode = "7002AA",
+adres = "Anna Blamanstraat 1"
+WHERE PersonID = 2294;
+
+UPDATE people SET
+postcode = "7381CG",
+adres = "De Zweep 16"
+WHERE PersonID = 2293;
+
+UPDATE people SET
+postcode = "6951DT",
+adres = "van der Duyn van Maasdamstraat"
+WHERE PersonID = 2292;
+
+UPDATE people SET
+postcode = "6868WP",
+adres = "Hertenstraat 31"
+WHERE PersonID = 2291;
+
+UPDATE people SET
+postcode = "7261SK",
+adres = "Koedijk 7"
+WHERE PersonID = 2290;
+
+UPDATE people SET
+postcode = "5324JL",
+adres = "Wordragensestraat 4"
+WHERE PersonID = 2289;
+
+UPDATE people SET
+postcode = "6678PE",
+adres = "Oosterhoutsestraat 48"
+WHERE PersonID = 2288;
+
+UPDATE people SET
+postcode = "7151ZV",
+adres = "Meidoornstraat 32"
+WHERE PersonID = 2287;
+
+UPDATE people SET
+postcode = "7071JD",
+adres = "Parkietstraat 2"
+WHERE PersonID = 2286;
+
+UPDATE people SET
+postcode = "6662SE",
+adres = "Kraaiekamp 2"
+WHERE PersonID = 2285;
+
+UPDATE people SET
+postcode = "6715CC",
+adres = "Mariaandaal 302"
+WHERE PersonID = 2284;
+
+UPDATE people SET
+postcode = "6642AA",
+adres = "Augustuslaan 2"
+WHERE PersonID = 2283;
+
+UPDATE people SET
+postcode = "6652DD",
+adres = "Ekelen 71"
+WHERE PersonID = 2282;
+
+UPDATE people SET
+postcode = "6942AB",
+adres = "Lockhorststraat 6"
+WHERE PersonID = 2281;
+
+UPDATE people SET
+postcode = "7038AS",
+adres = "Pastoor Terwindtstraat 2"
+WHERE PersonID = 2280;
+
+UPDATE people SET
+postcode = "6651KE",
+adres = "Kasteelpad 4"
+WHERE PersonID = 2279;
+
+
+
+
+
+
+
+

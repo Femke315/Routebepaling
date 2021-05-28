@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 public class HoofdschermGUI extends JFrame implements ActionListener {
 
@@ -24,13 +25,13 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
     private JButton menuRouteAanmaken;
     private JButton menuAccountBekijken;
     private JButton menuUitloggen;
+    private JButton menuHuidigeRoute;
 
     // Attributen voor accountpagina
     private JButton accountMenu;
 
     // Attributen voor route-aanmaakpagina
-    private JSpinner aanmaakAantalBezorguren;
-    private JSpinner aanmaakAantalRoutes;
+    private JComboBox provincieLijst;
     private JButton aanmaakBevestig;
     private JButton aanmaakMenu;
 
@@ -44,9 +45,21 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
     private int overzichtRouteID3;
     private int overzichtRouteID4;
     private JButton overzichtMenu;
-    JButton overzichtVolgendepagina;
-    JButton overzichtVorigepagina;
-    int overzichtHuidigePagina;
+    private JButton overzichtVolgendepagina;
+    private JButton overzichtVorigepagina;
+    private int overzichtHuidigePagina;
+
+    // Attributen voor bezorgrouteoverzichtpagina
+    private JButton bezorgrouteoverzichtMenu;
+    private JButton bezorgrouteoverzichtVerwijderroute;
+    private JButton bezorgrouteoverzichtKlaarzetten;
+    private JButton bezorgrouteoverzichtToeeigenen;
+    private JButton bezorgrouteoverzichtAfrondeRoute;
+    private JButton bezorgrouteoverzichtVolgendepagina;
+    private JButton bezorgrouteoverzichtVorigepagina;
+    private int bezorgrouteoverzichtHuidigePagina;
+    private int bezorgrouteoverzichtRouteID;
+
 
 
     public HoofdschermGUI() {
@@ -151,7 +164,7 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         loginBevestig.setForeground(textColor);
 
 
-        // Doorzichtbare tekst in mailadres tekstveld
+        // Doorzichtbare tekst/placeholder in mailadres tekstveld
         loginMail.setForeground(Color.GRAY);
         loginMail.setText("Mailadres");
         loginMail.addFocusListener(new FocusListener() {
@@ -171,7 +184,7 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         });
 
 
-        // Doorzichtbare tekst in wachtwoord tekstveld
+        // Doorzichtbare tekst/placeholder in wachtwoord tekstveld
         Checkbox passCheckBox = new Checkbox();
         passCheckBox.setState(true);
 
@@ -231,18 +244,21 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         titelTekst.setText("NerdyGadgets - Menupagina");
         JLabel menuTekst = new JLabel("Menu");
         menuRouteoverzicht = new JButton("Routeoverzicht");
+        menuHuidigeRoute = new JButton("Huidige route");
         menuRouteAanmaken = new JButton("Nieuwe routes aanmaken");
         menuAccountBekijken = new JButton("Account bekijken");
         menuUitloggen = new JButton("Uitloggen");
         menuRouteAanmaken.addActionListener(this);
         menuUitloggen.addActionListener(this);
         menuRouteoverzicht.addActionListener(this);
+        menuHuidigeRoute.addActionListener(this);
         menuAccountBekijken.addActionListener(this);
 
         // Opmaak van content
         menuTekst.setFont(menuTekst.getFont().deriveFont(30.0f));
 
         menuRouteoverzicht.setBorder(BorderFactory.createEmptyBorder());
+        menuHuidigeRoute.setBorder(BorderFactory.createEmptyBorder());
         menuRouteAanmaken.setBorder(BorderFactory.createEmptyBorder());
         menuAccountBekijken.setBorder(BorderFactory.createEmptyBorder());
         menuUitloggen.setBorder(BorderFactory.createEmptyBorder());
@@ -250,6 +266,8 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         menuTekst.setForeground(mainColor);
         menuRouteoverzicht.setBackground(mainColor);
         menuRouteoverzicht.setForeground(textColor);
+        menuHuidigeRoute.setBackground(mainColor);
+        menuHuidigeRoute.setForeground(textColor);
         menuRouteAanmaken.setBackground(mainColor);
         menuRouteAanmaken.setForeground(textColor);
         menuAccountBekijken.setBackground(mainColor);
@@ -265,6 +283,11 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
             menuRouteAanmaken.setBounds(100, 200, 200, 35);
             menuAccountBekijken.setBounds(100, 250, 200, 35);
             menuUitloggen.setBounds(100, 300, 200, 35);
+        } else if (Distributiemedewerker.getRoute()!=null) {
+            menuTekst.setBounds(160, 110, 200, 35);
+            menuHuidigeRoute.setBounds(100, 165, 200, 35);
+            menuAccountBekijken.setBounds(100, 215, 200, 35);
+            menuUitloggen.setBounds(100, 265, 200, 35);
         } else {
             menuTekst.setBounds(160, 110, 200, 35);
             menuRouteoverzicht.setBounds(100, 165, 200, 35);
@@ -273,11 +296,23 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         }
 
         // Toevoegen van content
-        add(menuTekst);
-        add(menuRouteoverzicht);
-        add(menuRouteAanmaken);
-        add(menuAccountBekijken);
-        add(menuUitloggen);
+        if (Distributiemedewerker.getFunctie().equals("Magazijn manager")) {
+            add(menuTekst);
+            add(menuRouteoverzicht);
+            add(menuRouteAanmaken);
+            add(menuAccountBekijken);
+            add(menuUitloggen);
+        } else if (Distributiemedewerker.getRoute()!=null) {
+            add(menuTekst);
+            add(menuHuidigeRoute);
+            add(menuAccountBekijken);
+            add(menuUitloggen);
+        } else {
+            add(menuTekst);
+            add(menuRouteoverzicht);
+            add(menuAccountBekijken);
+            add(menuUitloggen);
+        }
     }
 
     public void aanmakenAccountPagina(){
@@ -327,14 +362,30 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
     }
 
     public void aanmakenRouteAanmaakPagina(){
+        String[] provincieString = new String[13];
+        provincieString[0] = "";
+        provincieString[1] = "Friesland";
+        provincieString[2] = "Drenthe";
+        provincieString[3] = "Overijssel";
+        provincieString[4] = "Flevoland";
+        provincieString[5] = "Gelderland";
+        provincieString[6] = "Utrecht";
+        provincieString[7] = "Noord-Holland";
+        provincieString[8] = "Zuid-Holland";
+        provincieString[9] = "Zeeland";
+        provincieString[10] = "Noord-Brabant";
+        provincieString[11] = "Limburg";
+        provincieString[12] = "Groningen";
+
         // Aanmaken content
         titelTekst.setText("NerdyGadgets - Nieuwe routes aanmaken");
         JLabel aanmaakTekst = new JLabel("Nieuwe routes aanmaken");
-        JLabel aanmaakAantalBezorgurenTekst = new JLabel("Aantal bezorguren per route:");
-        JLabel aanmaakAantalRoutesTekst = new JLabel("Aantal te maken routes:");
-        aanmaakAantalBezorguren = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
-        aanmaakAantalRoutes = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
-        aanmaakBevestig = new JButton("Nieuwe routes aanmaken");
+        JLabel provincieTekst = new JLabel("Provincie:");
+        provincieLijst = new JComboBox(provincieString);
+        provincieLijst.setSelectedIndex(0);
+
+        aanmaakBevestig = new JButton("Nieuwe route aanmaken");
+        aanmaakBevestig.addActionListener(this);
         aanmaakMenu = new JButton("Menu");
         aanmaakMenu.addActionListener(this);
 
@@ -344,12 +395,10 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         aanmaakMenu.setBorder(BorderFactory.createEmptyBorder());
 
         aanmaakTekst.setForeground(mainColor);
-        aanmaakAantalBezorgurenTekst.setForeground(mainColor);
-        aanmaakAantalRoutesTekst.setForeground(mainColor);
-        aanmaakAantalBezorguren.setBackground(mainColor);
-        aanmaakAantalBezorguren.setForeground(textColor);
-        aanmaakAantalRoutes.setBackground(mainColor);
-        aanmaakAantalRoutes.setForeground(textColor);
+        provincieLijst.setForeground(textColor);
+        provincieLijst.setBackground(mainColor);
+        provincieTekst.setForeground(mainColor);
+        provincieTekst.setBackground(textColor);
         aanmaakBevestig.setBackground(mainColor);
         aanmaakBevestig.setForeground(textColor);
         aanmaakMenu.setBackground(mainColor);
@@ -357,21 +406,18 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
 
         // Positionering van content
         aanmaakTekst.setBounds(45, 100, 350, 35);
-        aanmaakAantalBezorgurenTekst.setBounds(80, 165, 200, 35);
-        aanmaakAantalBezorguren.setBounds(280, 165, 40, 35);
-        aanmaakAantalRoutesTekst.setBounds(80, 215, 200, 35);
-        aanmaakAantalRoutes.setBounds(280, 215, 40, 35);
+        provincieTekst.setBounds(100, 175, 200, 35);
+        provincieLijst.setBounds(175, 175, 125, 35);
         aanmaakBevestig.setBounds(100, 270, 200, 35);
         aanmaakMenu.setBounds(100, 320, 200, 35);
 
         // Toevoegen van content
         add(aanmaakTekst);
-        add(aanmaakAantalBezorgurenTekst);
-        add(aanmaakAantalBezorguren);
-        add(aanmaakAantalRoutesTekst);
-        add(aanmaakAantalRoutes);
+        add(provincieTekst);
+        add(provincieLijst);
         add(aanmaakBevestig);
         add(aanmaakMenu);
+
     }
 
     public void aanmakenRouteoverzichtPagina(){
@@ -388,7 +434,7 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
             routelijst.addAll(SQLqueries.getRoutes("Onderweg"));
         }
 
-        // Aantal paginas berekenen
+        // Aantal pagina's berekenen
         int aantalPaginas = (int) Math.ceil(routelijst.size()/4.00);
         if (aantalPaginas<1){
             aantalPaginas = 1;
@@ -582,6 +628,184 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
 
     }
 
+    public void aanmakenBezorgrouteoverzichtPagina(int routeid){
+        // Ophalen orders
+        ArrayList<Order> orderlijst = SQLqueries.showRoute(routeid);
+        bezorgrouteoverzichtRouteID = routeid;
+
+        // Aantal paginas berekenen
+        int aantalPaginas = (int) Math.ceil(orderlijst.size()/4.00);
+        if (aantalPaginas<1){
+            aantalPaginas = 1;
+        }
+        if (bezorgrouteoverzichtHuidigePagina==0) {
+            bezorgrouteoverzichtHuidigePagina =1;
+        }
+
+        // Routetitels en gegevens invullen
+        ArrayList<String> orderTitels = new ArrayList<String>();
+        ArrayList<String> orderGegevens = new ArrayList<String>();
+
+        for (int i=0; i<(aantalPaginas*4); i++) {
+            if (i<orderlijst.size()) {
+                if (Distributiemedewerker.getFunctie().equals("Magazijn manager") || Distributiemedewerker.getFunctie().equals("Bezorger")) {
+                    orderTitels.add("OrderID " + orderlijst.get(i).getOrderID() + ": " + orderlijst.get(i).getPlaats());
+                    orderGegevens.add(orderlijst.get(i).getAdres() + " " + orderlijst.get(i).getPostcode());
+                } else {
+                    Orderline orderline = new Orderline(orderlijst.get(i).getOrderID());
+                    orderTitels.add("OrderID " + orderlijst.get(i).getOrderID());
+                    orderGegevens.add(orderline.printOrderline(orderline));
+                    //orderGegevens.add(orderlijst.get(i).getAdres() + " " + orderlijst.get(i).getPostcode());
+                }
+            } else {
+                orderTitels.add("");
+                orderGegevens.add("");
+            }
+        }
+
+        // Aanmaken content
+        titelTekst.setText("NerdyGadgets - Bezorgrouteoverzicht: route " + routeid);
+        JLabel bezorgrouteoverzichtTekst = new JLabel("Bezorgroute "+ bezorgrouteoverzichtHuidigePagina + "/" + aantalPaginas);
+        bezorgrouteoverzichtMenu = new JButton("Menu");
+        bezorgrouteoverzichtVerwijderroute = new JButton("Verwijder route");
+        bezorgrouteoverzichtKlaarzetten= new JButton("Route is gesorteerd");
+        bezorgrouteoverzichtToeeigenen = new JButton("Route toe eigenen");
+        bezorgrouteoverzichtAfrondeRoute = new JButton("Route afronden");
+        bezorgrouteoverzichtMenu.addActionListener(this);
+        bezorgrouteoverzichtVerwijderroute.addActionListener(this);
+        bezorgrouteoverzichtKlaarzetten.addActionListener(this);
+        bezorgrouteoverzichtToeeigenen.addActionListener(this);
+        bezorgrouteoverzichtAfrondeRoute.addActionListener(this);
+
+        JLabel bezorgroutetitel1 = new JLabel(orderTitels.get(bezorgrouteoverzichtHuidigePagina*4-4));
+        JLabel bezorgroutegegevens1 = new JLabel(orderGegevens.get(bezorgrouteoverzichtHuidigePagina*4-4));
+
+        JLabel bezorgroutetitel2 = new JLabel(orderTitels.get(bezorgrouteoverzichtHuidigePagina*4-3));
+        JLabel bezorgroutegegevens2 = new JLabel(orderGegevens.get(bezorgrouteoverzichtHuidigePagina*4-3));
+
+        JLabel bezorgroutetitel3 = new JLabel(orderTitels.get(bezorgrouteoverzichtHuidigePagina*4-2));
+        JLabel bezorgroutegegevens3 = new JLabel(orderGegevens.get(bezorgrouteoverzichtHuidigePagina*4-2));
+
+        JLabel bezorgroutetitel4 = new JLabel(orderTitels.get(bezorgrouteoverzichtHuidigePagina*4-1));
+        JLabel bezorgroutegegevens4 = new JLabel(orderGegevens.get(bezorgrouteoverzichtHuidigePagina*4-1));
+
+        // Opmaak van content
+        bezorgrouteoverzichtTekst.setFont(bezorgrouteoverzichtTekst.getFont().deriveFont(30.0f));
+        bezorgrouteoverzichtMenu.setBorder(BorderFactory.createEmptyBorder());
+        bezorgrouteoverzichtVerwijderroute.setBorder(BorderFactory.createEmptyBorder());
+        bezorgrouteoverzichtKlaarzetten.setBorder(BorderFactory.createEmptyBorder());
+        bezorgrouteoverzichtToeeigenen.setBorder(BorderFactory.createEmptyBorder());
+        bezorgrouteoverzichtAfrondeRoute.setBorder(BorderFactory.createEmptyBorder());
+
+        bezorgrouteoverzichtTekst.setForeground(mainColor);
+        bezorgrouteoverzichtMenu.setBackground(mainColor);
+        bezorgrouteoverzichtVerwijderroute.setBackground(mainColor);
+        bezorgrouteoverzichtKlaarzetten.setBackground(mainColor);
+        bezorgrouteoverzichtToeeigenen.setBackground(mainColor);
+        bezorgrouteoverzichtAfrondeRoute.setBackground(mainColor);
+        bezorgrouteoverzichtMenu.setForeground(textColor);
+        bezorgrouteoverzichtVerwijderroute.setForeground(textColor);
+        bezorgrouteoverzichtKlaarzetten.setForeground(textColor);
+        bezorgrouteoverzichtToeeigenen.setForeground(textColor);
+        bezorgrouteoverzichtAfrondeRoute.setForeground(textColor);
+
+
+        bezorgroutetitel1.setBackground(mainColor);
+        bezorgroutetitel1.setForeground(textColor);
+        bezorgroutegegevens1.setBackground(mainColor);
+        bezorgroutegegevens1.setForeground(textColor);
+
+        bezorgroutetitel2.setBackground(mainColor);
+        bezorgroutetitel2.setForeground(textColor);
+        bezorgroutegegevens2.setBackground(mainColor);
+        bezorgroutegegevens2.setForeground(textColor);
+
+        bezorgroutetitel3.setBackground(mainColor);
+        bezorgroutetitel3.setForeground(textColor);
+        bezorgroutegegevens3.setBackground(mainColor);
+        bezorgroutegegevens3.setForeground(textColor);
+
+        bezorgroutetitel4.setBackground(mainColor);
+        bezorgroutetitel4.setForeground(textColor);
+        bezorgroutegegevens4.setBackground(mainColor);
+        bezorgroutegegevens4.setForeground(textColor);
+
+        // Positionering van content
+        bezorgrouteoverzichtTekst.setBounds(40, 70, 400, 35);
+        bezorgrouteoverzichtMenu.setBounds(40, 340, 200, 30);
+        bezorgrouteoverzichtVerwijderroute.setBounds(40, 340, 200, 30);
+        bezorgrouteoverzichtKlaarzetten.setBounds(40, 340, 200, 30);
+        bezorgrouteoverzichtToeeigenen.setBounds(40, 340, 200, 30);
+        bezorgrouteoverzichtAfrondeRoute.setBounds(40, 340, 200, 30);
+
+        bezorgroutetitel1.setBounds(40, 110, 300, 50);
+        bezorgroutegegevens1.setBounds(40, 130, 300, 50);
+
+        bezorgroutetitel2.setBounds(40, 160, 300, 50);
+        bezorgroutegegevens2.setBounds(40, 180, 300, 50);
+
+        bezorgroutetitel3.setBounds(40, 210, 300, 50);
+        bezorgroutegegevens3.setBounds(40, 230, 300, 50);
+
+        bezorgroutetitel4.setBounds(40, 260, 300, 50);
+        bezorgroutegegevens4.setBounds(40, 280, 300, 50);
+
+        // Toevoegen van content
+        add(bezorgrouteoverzichtTekst);
+        add(bezorgrouteoverzichtMenu);
+
+        add(bezorgroutetitel1);
+        add(bezorgroutegegevens1);
+        add(bezorgroutetitel2);
+        add(bezorgroutegegevens2);
+        add(bezorgroutetitel3);
+        add(bezorgroutegegevens3);
+        add(bezorgroutetitel4);
+        add(bezorgroutegegevens4);
+
+        // Pagina navigatie buttons
+        bezorgrouteoverzichtVolgendepagina = new JButton(">");
+        bezorgrouteoverzichtVorigepagina = new JButton("<");
+
+        bezorgrouteoverzichtVolgendepagina.addActionListener(this);
+        bezorgrouteoverzichtVorigepagina.addActionListener(this);
+
+        bezorgrouteoverzichtVolgendepagina.setBackground(mainColor);
+        bezorgrouteoverzichtVolgendepagina.setForeground(textColor);
+        bezorgrouteoverzichtVolgendepagina.setBorder(BorderFactory.createEmptyBorder());
+
+        bezorgrouteoverzichtVorigepagina.setBackground(mainColor);
+        bezorgrouteoverzichtVorigepagina.setForeground(textColor);
+        bezorgrouteoverzichtVorigepagina.setBorder(BorderFactory.createEmptyBorder());
+
+        bezorgrouteoverzichtVolgendepagina.setBounds(330, 340, 30, 30);
+        bezorgrouteoverzichtVorigepagina.setBounds(290, 340, 30, 30);
+
+        if (bezorgrouteoverzichtHuidigePagina<aantalPaginas) {
+            add(bezorgrouteoverzichtVolgendepagina);
+        }
+        if (bezorgrouteoverzichtHuidigePagina>1) {
+            add(bezorgrouteoverzichtVorigepagina);
+        }
+
+        // Route verwijderen, klaarzetten of toeeigenen buttons
+        if (bezorgrouteoverzichtHuidigePagina==aantalPaginas) {
+            remove(bezorgrouteoverzichtMenu);
+            if (Distributiemedewerker.getFunctie().equals("Magazijn manager")) {
+                add(bezorgrouteoverzichtVerwijderroute);
+            } else if (Distributiemedewerker.getFunctie().equals("Magazijn sorteerder")) {
+                add(bezorgrouteoverzichtKlaarzetten);
+            } else if (Distributiemedewerker.getFunctie().equals("Bezorger")) {
+                if (Distributiemedewerker.getRoute()!=null) {
+                    add(bezorgrouteoverzichtAfrondeRoute);
+                } else {
+                    add(bezorgrouteoverzichtToeeigenen);
+                }
+            }
+        }
+
+    }
+
     public void afrondenPagina() {
         getContentPane().removeAll();
         repaint();
@@ -627,7 +851,26 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         } else if (e.getSource() == menuRouteAanmaken) {
             afrondenPagina();
             aanmakenRouteAanmaakPagina();
-        } else if (e.getSource() == menuUitloggen) {
+        } else if (e.getSource() == aanmaakBevestig){
+            Route route = new Route(provincieLijst.getSelectedItem().toString());
+
+            if (route.getAantalPakketten() == 0) {
+                JFrame f = new JFrame();
+
+                JOptionPane.showMessageDialog(f,
+                        "ERROR: alle orders in de provincie " + provincieLijst.getSelectedItem().toString() + " zijn verwerkt!");
+            } else {
+
+                SQLqueries.toevoegenRoute(route);
+
+                JFrame f = new JFrame();
+                JOptionPane.showMessageDialog(f,
+                        "Route in provincie " + provincieLijst.getSelectedItem().toString() +  " is toegevoegd!"
+                        + "\n" + "Aantal pakketjes: " + route.getAantalPakketten()
+                        + "\n" + "Totale afstand (in km) = " + route.getAfstand());
+            }
+
+        }   else if (e.getSource() == menuUitloggen) {
             Distributiemedewerker.Uitloggen();
             overzichtHuidigePagina = 1;
             afrondenPagina();
@@ -638,6 +881,9 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
         } else if (e.getSource() == menuRouteoverzicht) {
             afrondenPagina();
             aanmakenRouteoverzichtPagina();
+        } else if (e.getSource() == menuHuidigeRoute){
+            afrondenPagina();
+            aanmakenBezorgrouteoverzichtPagina(Distributiemedewerker.getRoute().getRouteID());
         } else if (e.getSource() == overzichtVolgendepagina) {
             overzichtHuidigePagina = overzichtHuidigePagina + 1;
             afrondenPagina();
@@ -654,15 +900,50 @@ public class HoofdschermGUI extends JFrame implements ActionListener {
             aanmakenMenuPagina();
         } else if (e.getSource() == overzichtInfo1 || e.getSource() == overzichtInfo2 || e.getSource() == overzichtInfo3 || e.getSource() == overzichtInfo4) {
             if (e.getSource() == overzichtInfo1) {
-                System.out.println(overzichtRouteID1);
+                bezorgrouteoverzichtRouteID = overzichtRouteID1;
             } else if (e.getSource() == overzichtInfo2) {
-                System.out.println(overzichtRouteID2);
+                bezorgrouteoverzichtRouteID = overzichtRouteID2;
             } else if (e.getSource() == overzichtInfo3) {
-                System.out.println(overzichtRouteID3);
+                bezorgrouteoverzichtRouteID = overzichtRouteID3;
             } else {
-                System.out.println(overzichtRouteID4);
+                bezorgrouteoverzichtRouteID = overzichtRouteID4;
             }
-            //methode bezorgroutescherm(overzichtRouteID..)
+            afrondenPagina();
+            aanmakenBezorgrouteoverzichtPagina(bezorgrouteoverzichtRouteID);
+        } else if (e.getSource() == bezorgrouteoverzichtMenu) {
+            afrondenPagina();
+            if (Distributiemedewerker.getRoute()!=null) {
+                aanmakenMenuPagina();
+            } else {
+                aanmakenRouteoverzichtPagina();
+            }
+        } else if (e.getSource() == bezorgrouteoverzichtVolgendepagina) {
+            bezorgrouteoverzichtHuidigePagina = bezorgrouteoverzichtHuidigePagina + 1;
+            afrondenPagina();
+            aanmakenBezorgrouteoverzichtPagina(bezorgrouteoverzichtRouteID);
+        } else if (e.getSource() == bezorgrouteoverzichtVorigepagina) {
+            bezorgrouteoverzichtHuidigePagina = bezorgrouteoverzichtHuidigePagina - 1;
+            afrondenPagina();
+            aanmakenBezorgrouteoverzichtPagina(bezorgrouteoverzichtRouteID);
+        } else if (e.getSource() == bezorgrouteoverzichtVerwijderroute) {
+            // verwijder methode
+        } else if (e.getSource() == bezorgrouteoverzichtKlaarzetten) {
+            System.out.println(SQLqueries.statusNaarBezorging(bezorgrouteoverzichtRouteID));
+            afrondenPagina();
+            bezorgrouteoverzichtHuidigePagina = 1;
+            aanmakenMenuPagina();
+        } else if (e.getSource() == bezorgrouteoverzichtToeeigenen) {
+            System.out.println(SQLqueries.statusNaarOnderweg(bezorgrouteoverzichtRouteID, Distributiemedewerker.getPersonID()));
+            Distributiemedewerker.setRoute(SQLqueries.gekozenRouteOphalen(Distributiemedewerker.getPersonID()));
+            afrondenPagina();
+            bezorgrouteoverzichtHuidigePagina = 1;
+            aanmakenMenuPagina();
+        } else if (e.getSource() == bezorgrouteoverzichtAfrondeRoute) {
+            System.out.println(SQLqueries.routeAfronden(Distributiemedewerker.getRoute()));
+            Distributiemedewerker.setRoute(SQLqueries.gekozenRouteOphalen(Distributiemedewerker.getPersonID()));
+            afrondenPagina();
+            bezorgrouteoverzichtHuidigePagina = 1;
+            aanmakenMenuPagina();
         }
     }
 }
